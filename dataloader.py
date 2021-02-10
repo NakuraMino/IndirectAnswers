@@ -13,7 +13,6 @@ import numpy as np
 import os
 import pandas as pd
 from transformers import BertTokenizer
-# from transformers.
 
 class CircaDataset(Dataset):
     """
@@ -33,6 +32,11 @@ class CircaDataset(Dataset):
         return self.data.shape[0]
 
     def __getitem__(self, idx):
+        """
+        @param idx: index into the dataset
+
+        @return: dictionary mapping from th column titles to the value at each column + row(idx) pair
+        """
         header_to_data = dict()
         for header in self.data.columns:
             if header == "id":
@@ -51,6 +55,15 @@ class CircaDataset(Dataset):
 
 
 def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True):
+    """
+    creates a dataset and returns a dataloader 
+
+    @param file_path: the path to a circa.tsv file
+    @param batch_size (default=16): size of each batch
+    @param num_workers (default=4): the number of workers
+    @param shuffle (default=True): shuffle dataset or not (True or False value)
+    @return: torch.utils.data.DataLoader object    
+    """
     dataset = CircaDataset(file_path)
     return DataLoader(dataset,
                       batch_size=batch_size,
@@ -58,12 +71,12 @@ def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True):
                       num_workers=num_workers)
 
 if __name__ == "__main__":
+    # some really simple testing 
+
     dataset = CircaDataset('./data/circa-data.tsv')
     length = len(dataset)
     print(length)
-
     print(dataset[0])
-
     dataloader = getCircaDataloader('./data/circa-data.tsv', num_workers=1)
     dl_iter = iter(dataloader)
     print(next(dl_iter))

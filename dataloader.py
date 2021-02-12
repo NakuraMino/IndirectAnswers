@@ -19,15 +19,20 @@ class CircaDataset(Dataset):
     dataset class for the circa dataset 
     """
 
-    def __init__(self, file_path):
+    def __init__(self, file_path, tokenizer=None):
         """
         @param file_path: the path to a circa.tsv file
+        @param tokenizer (default=None): an optional tokenizer to convert text 
+                                         to tokens. If none is passed in, uses 
+                                         the bert-base-uncased tokenizer. 
         """
         self.file_path = file_path
         self.data = pd.read_csv(file_path, sep='\t')
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        print(type(self.tokenizer))
-    
+        if tokenizer == None:
+            self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        else:
+            self.tokenizer = tokenizer
+            
     def __len__(self):
         return self.data.shape[0]
 

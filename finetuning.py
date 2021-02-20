@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from tqdm import tqdm, trange
-from transformers import AutoTokenizer, AutoModel, AdamW
+from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertForMaskedLM
 
 import logging
 import torch
@@ -65,8 +65,8 @@ def main():
 
     args = parser.parse_args()
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model_type)
-    model = AutoModel.from_pretrained(args.model_type)
+    tokenizer = BertTokenizer.from_pretrained(args.model_type)
+    model = BertForMaskedLM.from_pretrained(args.model_type)
     # print(model)
     # print(tokenizer)
     device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
@@ -80,7 +80,8 @@ def main():
     logging.info(f"  Num epochs = {args.epochs}")
     # logging.info(f"  Batch size = {args.batch_size}")
     logging.info(f"  Learning rate = {args.learning_rate}")
-
+    total_loss = 0
+    global_step = 0
 
     train_iterator = trange(0, args.epochs, desc="Epoch")
     for epoch, _ in enumerate(train_iterator):

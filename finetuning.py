@@ -1,9 +1,10 @@
 from argparse import ArgumentParser
-from tqdm import tqdm
-from transformers import AutoTokenizer, AutoModel
+from tqdm import tqdm, trange
+from transformers import AutoTokenizer, AutoModel, AdamW
 
 import logging
 import torch
+import dataloader
 
 # Import the dataset to use here
 
@@ -14,11 +15,7 @@ logging.basicConfig(level=logging.INFO, format=log_format)
 def validate(args, model, tokenizer, data, device, epoch, model_losses):
     logging.info("***** Running development *****")
 
-    dataloader = DataLoader(
-        data,
-        shuffle=True,
-        batch_size=args.train_batch_size,
-    )
+    train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=4)
 
     dev_loss = 0.0
     nb_dev_step = 0
@@ -58,50 +55,57 @@ def validate(args, model, tokenizer, data, device, epoch, model_losses):
 
 
 def main():
-	parser = ArgumentParser()
-	parser.add_argument('--pregenerated_data', type=Path, required=True)
+    parser = ArgumentParser()
+    # parser.add_argument('--pregenerated_data', type=Path, required=True)
     parser.add_argument('--epochs', type=int, default=10, help="number of epochs to train for")
-	parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
-    parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
+    parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
+    # parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
     parser.add_argument('--learning_rate', default=1e-5, type=float, help="initial learning rate for Adam")
     parser.add_argument('--grad_clip', type=float, default=0.25, help="Grad clipping value")
 
-	args = parser.parse_args()
+    args = parser.parse_args()
 
-	model = AutoTokenizer.from_pretrained(args.model_type)
-	tokenizer = AutoModel.from_pretrained(args.model_type)
-
+    tokenizer = AutoTokenizer.from_pretrained(args.model_type)
+    model = AutoModel.from_pretrained(args.model_type)
+    # print(model)
+    # print(tokenizer)
     device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
 
-	logging.info("****** Running training *****")
-    logging.info(f"  Num examples = {len(database)}")
+    model.zero_grad()
+    params = [p for n,p in model.named_parameters()]
+    optimizer = AdamW(params, lr=args.learning_rate)
+
+    logging.info("****** Running training *****")
+    # logging.info(f"  Num examples = {len(database)}")
     logging.info(f"  Num epochs = {args.epochs}")
-    logging.info(f"  Batch size = {args.batch_size}")
+    # logging.info(f"  Batch size = {args.batch_size}")
     logging.info(f"  Learning rate = {args.learning_rate}")
 
 
-	train_iterator = trange(0, args.epochs, desc="Epoch")
+    train_iterator = trange(0, args.epochs, desc="Epoch")
     for epoch, _ in enumerate(train_iterator):
-        epoch_dataset = dataset_train                                                                   
-        train_dataloader = DataLoader(
-          	epoch_dataset, 
-            batch_size=args.train_batch_size, 
-            shuffle=False,
-        )
+        # epoch_dataset = dataset_train                                                                   
+        # train_dataloader = DataLoader(
+        #   	epoch_dataset, 
+        #     batch_size=args.train_batch_size, 
+        #     shuffle=False,
+        # )
+        train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=4)
+        
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")                                       
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
+        model.train()
         for step, batch in enumerate(epoch_iterator):                                                       
-        	model.train()
-
-        	input_ids, atten, labels = batch
+            input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
             input_ids = input_ids.to(device)                                                                
-            atten = atten.to(device)                                                                        
+            atten = atten.to(device)
             labels = labels.to(device)
+            token_type_id = token_type_id.to(device)
 
-            outputs = model(input_ids=input_ids, attention_mask=atten, labels=labels)
+            outputs = model(input_ids=input_ids, token_type_ids=token_type_id, attention_mask=atten, labels=labels)
 
-            loss = outputs[0]                                                                                                                                                                               
+            loss = outputs[0]                                                                                                                                               
             loss.backward()
 
             total_loss += loss.item()
@@ -113,8 +117,7 @@ def main():
             global_step += 1
             epoch_iterator.set_description(f"Loss: {total_loss / (global_step + 1)}")
 
-        validate(args, model, tokenizer, dataset_dev, device, epoch, model_losses)
-
+        # validate(args, model, tokenizer, dataset_dev, device, epoch, model_losses)
 
 if __name__ == '__main__':
-	main()
+    main()

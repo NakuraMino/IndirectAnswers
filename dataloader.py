@@ -51,12 +51,14 @@ class CircaDataset(Dataset):
                    "[SEP] " + str(self.data.loc[idx]['question-X']) + \
                    "[SEP] " + str(self.data.loc[idx]['answer-Y'])
         indexed_tokens = self.tokenizer(question, return_tensors="pt")
-        return {
+        header_to_data = {
             "judgements": judgement,
             "goldstandard1": label1,
             "goldstandard2": label2,
-            "question": indexed_tokens,
         }
+        for key in indexed_tokens:
+            header_to_data[key] = indexed_tokens[key]
+        return header_to_data
 
     def labelToIdx(self, label):
         """

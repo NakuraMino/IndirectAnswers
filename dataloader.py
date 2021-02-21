@@ -57,8 +57,8 @@ class CircaDataset(Dataset):
             header_to_data[key] = indexed_tokens[key]
         if self.use_tokenizer:
             for key in label1:
-                header_to_data["label1" + key] = label1[key]
-                header_to_data["label2" + key] = label2[key]
+                header_to_data["goldstandard1_" + key] = label1[key]
+                header_to_data["goldstandard2_" + key] = label2[key]
         else:
             header_to_data["goldstandard1"] = label1
             header_to_data["goldstandard2"] = label2

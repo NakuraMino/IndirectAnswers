@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from tqdm import tqdm, trange
-from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertForNextSentencePrediction
+from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertForMultipleChoice#BertForNextSentencePrediction
 
 import logging
 import torch
@@ -66,7 +66,7 @@ def main():
     args = parser.parse_args()
 
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
-    model = BertForNextSentencePrediction.from_pretrained(args.model_type)
+    model = BertForMultipleChoice.from_pretrained(args.model_type)
     # print(model)
     # print(tokenizer)
     #device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
@@ -95,14 +95,14 @@ def main():
         #     batch_size=args.train_batch_size, 
         #     shuffle=False,
         # )
-        train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1, use_tokenizer=True)
+        train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1, use_tokenizer=False)
         
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")                                       
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
         model.train()
         for step, batch in enumerate(epoch_iterator): 
-            input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1_input_ids'], batch['token_type_ids']
+            input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
             input_ids = input_ids.to(device)                                                                
             atten = atten.to(device)
             labels = labels.to(device)

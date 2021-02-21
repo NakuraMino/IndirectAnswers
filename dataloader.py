@@ -43,7 +43,6 @@ class CircaDataset(Dataset):
 
         @return: dictionary mapping from th column titles to the value at each column + row(idx) pair
         """
-        header_to_data = dict() 
         judgement = self.data.loc[idx]["judgements"]
         label1 = self.labelToIdx(self.data.loc[idx]["goldstandard1"])
         label2 = self.labelToIdx(self.data.loc[idx]["goldstandard2"])
@@ -53,11 +52,16 @@ class CircaDataset(Dataset):
         indexed_tokens = self.tokenizer(question, return_tensors="pt")
         header_to_data = {
             "judgements": judgement,
-            "goldstandard1": label1,
-            "goldstandard2": label2,
         }
         for key in indexed_tokens:
             header_to_data[key] = indexed_tokens[key]
+        if self.use_tokenizer:
+            for key in label1:
+                header_to_data["label1" + key] = label1[key]
+                header_to_data["label2" + key] = label2[key]
+        else:
+            header_to_data["goldstandard1"] = label1
+            header_to_data["goldstandard2"] = label2
         return header_to_data
 
     def labelToIdx(self, label):
@@ -108,9 +112,13 @@ if __name__ == "__main__":
     length = len(dataset)
     print(length)
     print(dataset[0])
-    dataloader = getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1)
+    dataloader = getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1, use_tokenizer=True)
     dl_iter = iter(dataloader)
     print(next(dl_iter))
+
+    # for i in range(length):
+    #     print(i) 
+    #     item = dataset[i]
 
 # def __getitem__(self, idx):
 #     """

@@ -92,7 +92,6 @@ def main():
         #     shuffle=False,
         # )
         train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=4)
-        
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")                                       
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0

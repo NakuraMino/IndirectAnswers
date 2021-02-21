@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from tqdm import tqdm, trange
-from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertForMaskedLM
+from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertForNextSentencePrediction
 
 import logging
 import torch
@@ -66,12 +66,16 @@ def main():
     args = parser.parse_args()
 
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
-    model = BertForMaskedLM.from_pretrained(args.model_type)
+    model = BertForNextSentencePrediction.from_pretrained(args.model_type)
     # print(model)
     # print(tokenizer)
-    device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+    #device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
 
     model.zero_grad()
+    model.to(device)
+
     params = [p for n,p in model.named_parameters()]
     optimizer = AdamW(params, lr=args.learning_rate)
 
@@ -91,19 +95,34 @@ def main():
         #     batch_size=args.train_batch_size, 
         #     shuffle=False,
         # )
-        train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=4)
+        train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1, use_tokenizer=True)
         
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")                                       
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
         model.train()
-        for step, batch in enumerate(epoch_iterator):                                                       
+        for step, batch in enumerate(epoch_iterator): 
             input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
             input_ids = input_ids.to(device)                                                                
             atten = atten.to(device)
             labels = labels.to(device)
             token_type_id = token_type_id.to(device)
 
+            input_ids = torch.reshape(input_ids, (1, -1))
+            atten = torch.reshape(atten, (1, -1))
+            labels = torch.reshape(labels, (1, -1))
+            token_type_id = torch.reshape(token_type_id, (1, -1))
+
+            #input_ids = torch.unsqueeze(input_ids, 0)
+            #atten = torch.unsqueeze(atten, 0)
+            #labels = torch.unsqueeze(labels, 0)
+            #token_type_id = torch.unsqueeze(token_type_id, 0)
+            
+            print("shape of input_ids:", input_ids.size())
+            print("Here's input_ids:", input_ids)
+            print("shape of atten:", atten.size())
+            print("labels:", labels.shape)
+            print("token_type_ids:", token_type_id.shape)
             outputs = model(input_ids=input_ids, token_type_ids=token_type_id, attention_mask=atten, labels=labels)
 
             loss = outputs[0]                                                                                                                                               

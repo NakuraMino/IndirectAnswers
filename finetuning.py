@@ -102,7 +102,7 @@ def main():
         nb_tr_examples, nb_tr_steps = 0, 0
         model.train()
         for step, batch in enumerate(epoch_iterator): 
-            input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+            input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1_input_ids'], batch['token_type_ids']
             input_ids = input_ids.to(device)                                                                
             atten = atten.to(device)
             labels = labels.to(device)

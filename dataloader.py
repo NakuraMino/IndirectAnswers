@@ -12,6 +12,7 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import os
 import pandas as pd
+import time
 from transformers import BertTokenizer
 
 class CircaDataset(Dataset):
@@ -33,6 +34,8 @@ class CircaDataset(Dataset):
             self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         else:
             self.tokenizer = tokenizer
+
+        time.sleep(5)
             
     def __len__(self):
         return self.data.shape[0]
@@ -55,6 +58,7 @@ class CircaDataset(Dataset):
         }
         for key in indexed_tokens:
             header_to_data[key] = indexed_tokens[key]
+        
         if self.use_tokenizer:
             for key in label1:
                 header_to_data["goldstandard1_" + key] = label1[key]

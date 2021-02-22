@@ -97,7 +97,7 @@ class CircaDataset(Dataset):
         else: # nan/NA case
             return 8
 
-def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, use_tokenizer=False):
+def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=False, use_tokenizer=False):
     """
     creates a dataset and returns a dataloader 
 

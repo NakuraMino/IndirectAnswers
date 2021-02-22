@@ -94,6 +94,10 @@ class CircaDataset(Dataset):
         elif label == "I am not sure how X will interpret Y's answer":
             return 8
 
+    def collate_fn(self, batch):
+        print("hi") 
+        print(batch)
+
 def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, use_tokenizer=False):
     """
     creates a dataset and returns a dataloader 
@@ -108,6 +112,7 @@ def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, us
     return DataLoader(dataset,
                       batch_size=batch_size,
                       shuffle=shuffle,
+                      collate_fn=dataset.collate_fn,
                       num_workers=num_workers)
 
 if __name__ == "__main__":
@@ -116,7 +121,7 @@ if __name__ == "__main__":
     length = len(dataset)
     print(length)
     print(dataset[0])
-    dataloader = getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1, use_tokenizer=True)
+    dataloader = getCircaDataloader('./data/circa-data.tsv', batch_size=2, num_workers=1, use_tokenizer=True)
     dl_iter = iter(dataloader)
     print(next(dl_iter))
 

@@ -102,8 +102,8 @@ class CircaDataset(Dataset):
         for data in batch:
             batch_dict['judgements'].append(data['judgements'])
         # label
-        batch_dict["goldstandard1"] = torch.zeros((len(batch),))
-        batch_dict["goldstandard2"] = torch.zeros((len(batch),))
+        batch_dict["goldstandard1"] = torch.zeros((len(batch),)).long()
+        batch_dict["goldstandard2"] = torch.zeros((len(batch),)).long()
         idx = 0
         for data in batch:
             batch_dict["goldstandard1"][idx] = data['goldstandard1']

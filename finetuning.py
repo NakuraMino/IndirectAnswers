@@ -3,6 +3,7 @@ from pathlib import Path
 from tqdm import tqdm, trange
 from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertForSequenceClassification, BertConfig
 
+import os
 import logging
 import torch
 import dataloader
@@ -13,30 +14,35 @@ log_format = '%(asctime)-10s: %(message)s'
 logging.basicConfig(level=logging.INFO, format=log_format)
 
 # Runs validation to find the best model
-def validate(args, model, tokenizer, data, device, epoch, model_losses):
+def validate(args, model, tokenizer, device, epoch, model_losses):
     logging.info("***** Running development *****")
 
-    dataloader = dataloader.getCircaDataloader(args.dev_data, batch_size=1, num_workers=4)
+    dev_dataloader = dataloader.getCircaDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, use_tokenizer=False, tokenizer=tokenizer)
 
     dev_loss = 0.0
     nb_dev_step = 0
 
     model.eval()
-    for batch in tqdm(dataloader, desc="Checking dev model accuracy..."):
-        with torch.no_grad():
-            inputs = batch[0].to(device)
-            atten = batch[1].to(device)
-            labels = batch[2].to(device)
 
-            outputs = model(input_ids=inputs, attention_mask=atten, labels=labels)
+    for batch in tqdm(dev_dataloader, desc="Checking dev model accuracy..."):
+        with torch.no_grad():
+            input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+
+            input_ids = input_ids.to(device)
+            atten = atten.to(device)
+            labels = labels.to(device).squeeze()
+            token_type_id = token_type_id.to(device)
+
+            outputs = model(input_ids=input_ids, attention_mask=atten, token_type_ids=token_type_id, labels=labels)
             tmp_dev_loss, _ = outputs[:2]
 
             dev_loss += tmp_dev_loss.item()
             nb_dev_step += 1
 
     loss = dev_loss / nb_dev_step
+    print("Validation loss:", loss)
     model_losses.append(loss)
-    writer.add_scalar('dev_loss', loss, epoch)
+    
 
     # Saving a trained model
     logging.info("** ** * Saving validated model ** ** * ")
@@ -60,9 +66,10 @@ def main():
     parser.add_argument('--train_data', type=Path, required=True)
     parser.add_argument('--dev_data', type=Path, required=True)
     parser.add_argument('--test_data', type=Path, required=True)
-    parser.add_argument('--epochs', type=int, default=10, help="number of epochs to train for")
+    parser.add_argument('--output_dir', type=Path, required=True)
+    parser.add_argument('--epochs', type=int, default=20, help="number of epochs to train for")
     parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
-    # parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
+    parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
     parser.add_argument('--learning_rate', default=1e-5, type=float, help="initial learning rate for Adam")
     parser.add_argument('--grad_clip', type=float, default=0.25, help="Grad clipping value")
     parser.add_argument('--num_labels', type=int, required=True, help="choose the number of labels for the experiment")
@@ -73,8 +80,8 @@ def main():
 
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
     model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
-    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    device = "cpu"
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    #device = "cpu"
     
     model.zero_grad()
     model.to(device)
@@ -97,27 +104,26 @@ def main():
         #     shuffle=False,
         # )
         #train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1, use_tokenizer=False)
-        train_dataloader = dataloader.getCircaDataloader(args.train_data, batch_size=1, num_workers=1, use_tokenizer=False)
+        train_dataloader = dataloader.getCircaDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, use_tokenizer=False, tokenizer=tokenizer)
 
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")                                       
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
         model.train()
+        
         for step, batch in enumerate(epoch_iterator): 
             input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
 
-            input_ids = torch.empty(1, 37).type(torch.LongTensor)
-            atten = torch.empty(1, 37).type(torch.LongTensor)
-            token_type_id = torch.empty(1, 37).type(torch.LongTensor)
-            #input_ids = input_ids.to(device)
-            #atten = atten.to(device)
+            input_ids = input_ids.to(device)
+            atten = atten.to(device)
             labels = labels.to(device).squeeze()
-            #token_type_id = token_type_id.to(device)
+            token_type_id = token_type_id.to(device)
 
-            input_ids = torch.reshape(input_ids, (1, -1))
-            atten = torch.reshape(atten, (1, -1))
-            token_type_id = torch.reshape(token_type_id, (1, -1))
+            #input_ids = torch.reshape(input_ids, (1, -1))
+            #atten = torch.reshape(atten, (1, -1))
+            #token_type_id = torch.reshape(token_type_id, (1, -1))
 
+            '''
             print("Here's ids:", input_ids)
             print("Here's atten:", atten)
             print("Here's token_type_id", token_type_id)
@@ -126,9 +132,9 @@ def main():
             print("Shape of atten:", atten.shape)
             print("Shape of token_type_ids:", token_type_id.shape)
             print("Shape of labels:", labels.shape)
+            '''
 
-            print()
-
+            
             outputs = model(input_ids=input_ids, token_type_ids=token_type_id, attention_mask=atten, labels=labels)
 
             loss = outputs[0]                                                                                                                                               
@@ -142,8 +148,9 @@ def main():
 
             global_step += 1
             epoch_iterator.set_description(f"Loss: {total_loss / (global_step + 1)}")
-
-        validate(args, model, tokenizer, dataset_dev, device, epoch, model_losses)
+        
+        model_losses = []
+        validate(args, model, tokenizer, device, epoch, model_losses)
 
 if __name__ == '__main__':
     main()

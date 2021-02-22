@@ -77,21 +77,24 @@ class CircaDataset(Dataset):
         """
         if self.use_tokenizer: 
             return self.tokenizer(label, return_tensors="pt")
+
         if label == 'Yes':
-            return 1
+            return 0
         elif label == 'No':
-            return 2
+            return 1
         elif label == 'Yes, subject to some conditions':
-            return 3
+            return 2
         elif label == "In the middle, neither yes nor no":
-            return 4
+            return 3
         elif label == "Other":
-            return 5
+            return 4
         elif label == 'Probably yes / sometimes yes':
-            return 6
+            return 5
         elif label == "Probably no":
-            return 7
+            return 6
         elif label == "I am not sure how X will interpret Y's answer":
+            return 7
+        else: # nan/NA case
             return 8
 
     def collate_fn(self, batch):

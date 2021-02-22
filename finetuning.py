@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from tqdm import tqdm, trange
-from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertForMultipleChoice#BertForNextSentencePrediction
+from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertForSequenceClassification, BertConfig
 
 import logging
 import torch
@@ -62,17 +62,17 @@ def main():
     # parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
     parser.add_argument('--learning_rate', default=1e-5, type=float, help="initial learning rate for Adam")
     parser.add_argument('--grad_clip', type=float, default=0.25, help="Grad clipping value")
+    parser.add_argument('--num_labels', type=int, required=True, help="choose the number of labels for the experiment")
 
     args = parser.parse_args()
+    
+    config = BertConfig.from_pretrained(args.model_type, num_labels=args.num_labels)
 
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
-    model = BertForMultipleChoice.from_pretrained(args.model_type)
-    # print(model)
-    # print(tokenizer)
-    #device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+    model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     #device = "cpu"
-
+    
     model.zero_grad()
     model.to(device)
 
@@ -80,9 +80,7 @@ def main():
     optimizer = AdamW(params, lr=args.learning_rate)
 
     logging.info("****** Running training *****")
-    # logging.info(f"  Num examples = {len(database)}")
     logging.info(f"  Num epochs = {args.epochs}")
-    # logging.info(f"  Batch size = {args.batch_size}")
     logging.info(f"  Learning rate = {args.learning_rate}")
     total_loss = 0
     global_step = 0
@@ -103,26 +101,16 @@ def main():
         model.train()
         for step, batch in enumerate(epoch_iterator): 
             input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+
             input_ids = input_ids.to(device)                                                                
             atten = atten.to(device)
-            labels = labels.to(device)
+            labels = labels.to(device).squeeze()
             token_type_id = token_type_id.to(device)
 
             input_ids = torch.reshape(input_ids, (1, -1))
             atten = torch.reshape(atten, (1, -1))
-            labels = torch.reshape(labels, (1, -1))
             token_type_id = torch.reshape(token_type_id, (1, -1))
 
-            #input_ids = torch.unsqueeze(input_ids, 0)
-            #atten = torch.unsqueeze(atten, 0)
-            #labels = torch.unsqueeze(labels, 0)
-            #token_type_id = torch.unsqueeze(token_type_id, 0)
-            
-            print("shape of input_ids:", input_ids.size())
-            print("Here's input_ids:", input_ids)
-            print("shape of atten:", atten.size())
-            print("labels:", labels.shape)
-            print("token_type_ids:", token_type_id.shape)
             outputs = model(input_ids=input_ids, token_type_ids=token_type_id, attention_mask=atten, labels=labels)
 
             loss = outputs[0]                                                                                                                                               

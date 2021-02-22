@@ -34,8 +34,7 @@ class CircaDataset(Dataset):
             self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         else:
             self.tokenizer = tokenizer
-
-        time.sleep(5)
+        time.sleep(2)
             
     def __len__(self):
         return self.data.shape[0]
@@ -56,9 +55,7 @@ class CircaDataset(Dataset):
         header_to_data = {
             "judgements": judgement,
         }
-        for key in indexed_tokens:
-            header_to_data[key] = indexed_tokens[key]
-        
+        header_to_data['question'] = question
         if self.use_tokenizer:
             for key in label1:
                 header_to_data["goldstandard1_" + key] = label1[key]
@@ -97,7 +94,31 @@ class CircaDataset(Dataset):
         else: # nan/NA case
             return 8
 
-def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=False, use_tokenizer=False):
+    def collate_fn(self, batch):
+        batch_dict = dict()
+        batch_size = len(batch)
+        # judgement
+        batch_dict['judgements'] = list()    
+        for data in batch:
+            batch_dict['judgements'].append(data['judgements'])
+        # label
+        batch_dict["goldstandard1"] = torch.zeros((len(batch),))
+        batch_dict["goldstandard2"] = torch.zeros((len(batch),))
+        idx = 0
+        for data in batch:
+            batch_dict["goldstandard1"][idx] = data['goldstandard1']
+            batch_dict["goldstandard2"][idx] = data['goldstandard2']
+            idx += 1
+        # input strings
+        questions_list = list()
+        for data in batch:
+            questions_list.append(data["question"])
+        indexed_tokens = self.tokenizer(questions_list, padding=True, return_tensors="pt")
+        for key in indexed_tokens:
+            batch_dict[key] = indexed_tokens[key]
+        return batch_dict
+
+def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, tokenizer=None, use_tokenizer=False):
     """
     creates a dataset and returns a dataloader 
 
@@ -107,10 +128,11 @@ def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=False, u
     @param shuffle (default=True): shuffle dataset or not (True or False value)
     @return: torch.utils.data.DataLoader object    
     """
-    dataset = CircaDataset(file_path, use_tokenizer=use_tokenizer)
+    dataset = CircaDataset(file_path, tokenizer=tokenizer, use_tokenizer=use_tokenizer)
     return DataLoader(dataset,
                       batch_size=batch_size,
                       shuffle=shuffle,
+                      collate_fn=dataset.collate_fn,
                       num_workers=num_workers)
 
 if __name__ == "__main__":
@@ -118,34 +140,12 @@ if __name__ == "__main__":
     dataset = CircaDataset('./data/circa-data.tsv')
     length = len(dataset)
     print(length)
-    print(dataset[0])
-    dataloader = getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1, use_tokenizer=True)
+    for key in dataset[0]:
+        print(key)
+    dataloader = getCircaDataloader('./data/circa-data.tsv', batch_size=2, num_workers=1, use_tokenizer=False)
     dl_iter = iter(dataloader)
-    print(next(dl_iter))
-
-    # for i in range(length):
-    #     print(i) 
-    #     item = dataset[i]
-
-# def __getitem__(self, idx):
-#     """
-#     @param idx: index into the dataset
-
-#     @return: dictionary mapping from th column titles to the value at each column + row(idx) pair
-#     """
-#     header_to_data = dict()
-#     for header in self.data.columns:
-#         if header == "id":
-#             data = self.data.loc[idx][header]                                
-#         elif header == "judgements" or header == "goldstandard1" or header == "goldstandard2":
-#             # data labels
-#             data = self.data.loc[idx][header]
-#         else: 
-#             # context, question-X, canquestion-X, answer-Y
-#             text = str(self.data.loc[idx][header]) 
-#             indexed_tokens = self.tokenizer(text, return_tensors="pt")
-#             # tokenized_text = self.tokenizer.tokenize(text)
-#             # indexed_tokens = torch.tensor(self.tokenizer.convert_tokens_to_ids(tokenized_text))
-#             data = indexed_tokens
-#         header_to_data[header] = data
-#     return header_to_data
+    batch = next(dl_iter)
+    print(batch)
+    print(type(batch))
+    print(batch['judgements'])
+    print(batch['goldstandard1'])

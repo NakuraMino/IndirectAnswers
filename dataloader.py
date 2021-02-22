@@ -118,7 +118,7 @@ class CircaDataset(Dataset):
             batch_dict[key] = indexed_tokens[key]
         return batch_dict
 
-def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, use_tokenizer=False):
+def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, tokenizer=None, use_tokenizer=False):
     """
     creates a dataset and returns a dataloader 
 
@@ -128,7 +128,7 @@ def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, us
     @param shuffle (default=True): shuffle dataset or not (True or False value)
     @return: torch.utils.data.DataLoader object    
     """
-    dataset = CircaDataset(file_path, use_tokenizer=use_tokenizer)
+    dataset = CircaDataset(file_path, tokenizer=tokenizer, use_tokenizer=use_tokenizer)
     return DataLoader(dataset,
                       batch_size=batch_size,
                       shuffle=shuffle,
@@ -149,4 +149,3 @@ if __name__ == "__main__":
     print(type(batch))
     print(batch['judgements'])
     print(batch['goldstandard1'])
-    

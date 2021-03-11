@@ -2,8 +2,8 @@
 
 ## File for finetuning on the datasets
 
-BASE_DIR="/data2/limill01/IndirectAnswers"
-OUTPUT_DIR="/data2/limill01/IndirectAnswers/results"
+BASE_DIR="/data2/limill01/IndirectAnswers/"
+OUTPUT_DIR="/data2/limill01/IndirectAnswers/results/"
 MODEL_TYPE="bert-base-cased"
 
 cd "$BASE_DIR"

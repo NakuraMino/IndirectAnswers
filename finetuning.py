@@ -6,6 +6,9 @@ from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertFor
 import os
 import logging
 import torch
+import shutil
+import pandas as pd
+import numpy as np
 import dataloader
 
 # Import the dataset to use here
@@ -43,23 +46,32 @@ def validate(args, model, tokenizer, device, epoch, model_losses):
     print("Validation loss:", loss)
     model_losses.append(loss)
     
-
     # Saving a trained model
     logging.info("** ** * Saving validated model ** ** * ")
     model_to_save = model.module if hasattr(model, 'module') else model
 
-    path = str(epoch)
+    print("Saving model:", model_to_save)
+
+    path = str(epoch) + "/"
     full_path = os.path.join(args.output_dir, path)
     if os.path.exists(full_path):
         shutil.rmtree(full_path)
     os.mkdir(full_path)
-    output_model_file = os.path.join(args.output_dir, path, "pytorch_model.bin")
-    output_config_file = os.path.join(args.output_dir, path, "config.json")
+    print("here's the full-path:", full_path)
+    output_model_file = os.path.join(full_path, "pytorch_model.bin")
+    output_config_file = os.path.join(full_path, "config.json")
 
-    torch.save(model_to_save.state_dict(), output_model_file)
-    model_to_save.config.to_json_file(output_config_file)
-    tokenizer.save_vocabulary(os.path.join(args.output_dir, path))
+    print("Here's output_model_file:", output_model_file)
+    print("Here's output_config_file", output_config_file)
 
+    torch.save(model_to_save.state_dict(), "/data2/limill01/IndirectAnswers/results/0/pytorch_model.bin")
+    model_to_save.config.to_json_file("/data2/limill01/IndirectAnswers/results/0/config.json")
+    tokenizer.save_vocabulary("/data2/limill01/IndirectAnswers/results/0/")
+    #torch.save(model_to_save.state_dict(), output_model_file)
+    #model_to_save.config.to_json_file(output_config_file)
+    #tokenizer.save_vocabulary(os.path.join(args.output_dir, path))
+            
+    print("Got to the end so save pls")
 
 def main():
     parser = ArgumentParser()
@@ -67,7 +79,7 @@ def main():
     parser.add_argument('--dev_data', type=Path, required=True)
     parser.add_argument('--test_data', type=Path, required=True)
     parser.add_argument('--output_dir', type=Path, required=True)
-    parser.add_argument('--epochs', type=int, default=20, help="number of epochs to train for")
+    parser.add_argument('--epochs', type=int, default=1, help="number of epochs to train for")
     parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
     parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
     parser.add_argument('--learning_rate', default=1e-5, type=float, help="initial learning rate for Adam")
@@ -110,7 +122,8 @@ def main():
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
         model.train()
-        
+       
+        ''' 
         for step, batch in enumerate(epoch_iterator): 
             input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
 
@@ -123,18 +136,6 @@ def main():
             #atten = torch.reshape(atten, (1, -1))
             #token_type_id = torch.reshape(token_type_id, (1, -1))
 
-            '''
-            print("Here's ids:", input_ids)
-            print("Here's atten:", atten)
-            print("Here's token_type_id", token_type_id)
-            print("Here's labels:", labels)
-            print("Shape of ids:", input_ids.shape)
-            print("Shape of atten:", atten.shape)
-            print("Shape of token_type_ids:", token_type_id.shape)
-            print("Shape of labels:", labels.shape)
-            '''
-
-            
             outputs = model(input_ids=input_ids, token_type_ids=token_type_id, attention_mask=atten, labels=labels)
 
             loss = outputs[0]                                                                                                                                               
@@ -149,8 +150,34 @@ def main():
             global_step += 1
             epoch_iterator.set_description(f"Loss: {total_loss / (global_step + 1)}")
         
+        '''
         model_losses = []
         validate(args, model, tokenizer, device, epoch, model_losses)
+
+    loss_arr = np.asarray(model_losses)
+
+    df = pd.DataFrame(loss_arr)
+
+    # Evaluate - use the best model
+    min_loss_idx = np.argmin(loss_arr)
+      
+    path = str(min_loss_idx)
+
+    full_path = os.path.join(args.output_dir, path)
+    if os.path.exists(full_path):
+        shutil.rmtree(full_path)
+    os.mkdir(full_path)
+    
+    # Open the model
+    print("Here's the path:", full_path)
+    model_to_save = BertTokenizer.from_pretrained(full_path)
+    
+    output_model_file = os.path.join(args.output_dir, "pytorch_model.bin")
+    output_config_file = os.path.join(args.output_dir, "config.json")
+
+    torch.save(model_to_save.state_dict(), output_model_file)
+    model_to_save.config.to_json_file(output_config_file)
+    tokenizer.save_vocabulary(os.path.join(args.output_dir, path)) 
 
 if __name__ == '__main__':
     main()

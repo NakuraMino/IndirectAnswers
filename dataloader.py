@@ -7,6 +7,7 @@ Useful links:
 - https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html
 - https://github.com/google-research-datasets/boolean-questions
 - https://github.com/google-research-datasets/circa
+- https://cims.nyu.edu/~sbowman/multinli/
 """
 
 import torch 
@@ -207,6 +208,88 @@ class BOOLQDataset(Dataset):
             batch_dict[key] = indexed_tokens[key]
         return batch_dict
 
+class MNLIDataset(Dataset):
+    """
+    loads the MNLI dataset
+    """
+    def __init__(self, file_path, tokenizer=None):
+        """
+        @param file_path: the path to a train.jsonl file
+        """
+        with open(file_path, encoding='iso-8859-1') as f:
+            # TODO: encoding is wrong
+            self.json_lines = f.readlines()
+        if tokenizer == None:
+            self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        else:
+            self.tokenizer = tokenizer
+
+    def __len__(self): 
+        return len(self.json_lines)
+
+    def __getitem__(self, idx):
+        """
+        @param idx: int index into the dataset
+        @returns: dictionary of the format:
+        """
+        json_string = self.json_lines[idx]
+        json_dict = json.loads(json_string)
+        json_dict["gold_label"] = self.labelToIdx(json_dict["gold_label"])
+        return json_dict
+
+    def collate_fn(self, batch):
+        """
+        @param batch: list of datapoints (dictionaries), each from __getitem__
+                     with length N 
+        @return: a dictionary with the following keys:
+            {
+                sent1input_ids: (N,K) torch.floatTensor of tokens representing the input sentence,
+                sent2input_ids: (N,K) torch.floatTensor of tokens representing the input sentence,
+                sent1token_type_ids: (N,K) torch.LongTensor of the token types,
+                sent2token_type_ids: (N,K) torch.LongTensor of the token types,
+                sentence1: the original input sentence,
+                sentence2: the original second input sentence,
+                sent1attention_mask: (N,K) torch.LongTensor of the attention masks,
+                sent2attention_mask: (N,K) torch.LongTensor of the attention masks,
+                gold_labels: (N,) torch.longTensor
+            }
+        """
+        batch_dict = dict()
+        sent_one_list = list()
+        sent_two_list = list()
+        labels = torch.zeros((len(batch),)).long()
+        idx = 0
+        for data in batch:
+            sent_one_list += [data["sentence1"]]
+            sent_two_list += [data["sentence2"]]
+            labels[idx] = data["gold_label"]
+            idx += 1
+        sent_one_tokenized = self.tokenizer(sent_one_list, padding=True, return_tensors="pt")
+        sent_two_tokenized = self.tokenizer(sent_two_list, padding=True, return_tensors="pt")
+        for key in sent_one_tokenized:
+            batch_dict["sent1" + key] = sent_one_tokenized[key]
+            batch_dict["sent2" + key] = sent_two_tokenized[key]
+        batch_dict["gold_labels"] = labels
+        batch_dict["sentence1"] = sent_one_list
+        batch_dict["sentence2"] = sent_two_list
+        return batch_dict
+
+    def labelToIdx(self, label):
+        """
+        maps a label from the circa dataset to a numerical value 
+        
+        @param label: the gold label
+        @return: a value 0 - 4 which encodes the label
+        """
+        if label == "entailment":
+            return 0
+        elif label == "neutral": 
+            return 1
+        elif label == "contradiction":
+            return 2
+        else:
+            return 3
+
 def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, tokenizer=None, use_tokenizer=False):
     """
     creates a dataset and returns a dataloader 
@@ -241,8 +324,35 @@ def getBOOLQDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, to
                       collate_fn=dataset.collate_fn,
                       num_workers=num_workers)
 
+def getMNLIDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, tokenizer=None):
+    """
+    creates a dataset and returns a dataloader 
+
+    @param file_path: the path to a train.jsonl file
+    @param batch_size (default=16): size of each batch
+    @param num_workers (default=4): the number of workers
+    @param shuffle (default=True): shuffle dataset or not (True or False value)
+    @return: torch.utils.data.DataLoader object    
+    """
+    dataset = MNLIDataset(file_path, tokenizer=tokenizer)
+    return DataLoader(dataset,
+                      batch_size=batch_size,
+                      shuffle=shuffle,
+                      collate_fn=dataset.collate_fn,
+                      num_workers=num_workers)
 
 if __name__ == "__main__":
+    #testing MNLI dataset
+    md = MNLIDataset("data/mnli/multinli_1.0_train.jsonl")
+    dataloader = getMNLIDataloader("data/mnli/multinli_1.0_train.jsonl", batch_size=2, num_workers=1)
+    dl_iter = iter(dataloader)
+    batch = next(dl_iter)
+    for key in batch:
+        print(f"{key}: {type(batch[key])}")
+    print(batch)
+    # print(batch)
+
+if False: #__name__ == "__main__":
     # testing BOOLQ dataset
     dataset = BOOLQDataset('./data/BoolQ/train.jsonl')
     print(dataset[0])

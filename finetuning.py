@@ -44,7 +44,6 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
 
     loss = dev_loss / nb_dev_step
     print("Validation loss:", loss)
-    #model_losses.append(loss)
     
     if loss < min_loss:
         min_loss = loss

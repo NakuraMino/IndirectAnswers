@@ -9,7 +9,7 @@ MODEL_TYPE="bert-base-cased"
 cd "$BASE_DIR"
 
 ## Modify the script so that we can make a new directory for the different BERT experiments
-## For label of size 9
+## For label of size 6
 echo "Finetuning on CIRCA with relaxed labels..."
 
 # Epochs: 2, Learning rate: 5e-5, train batch size: 16
@@ -23,7 +23,7 @@ python finetuning.py \
     --learning_rate " 5e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 3, Learning rate: 5e-5, train batch size: 16
 python finetuning.py \
@@ -36,7 +36,7 @@ python finetuning.py \
     --learning_rate " 5e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 4, Learning rate: 5e-5, train batch size: 16
 python finetuning.py \
@@ -49,7 +49,7 @@ python finetuning.py \
     --learning_rate " 5e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 2, Learning rate: 3e-5, train batch size: 16
 python finetuning.py \
@@ -62,7 +62,7 @@ python finetuning.py \
     --learning_rate " 3e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 3, Learning rate: 3e-5, train batch size: 16
 python finetuning.py \
@@ -75,7 +75,7 @@ python finetuning.py \
     --learning_rate " 3e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 4, Learning rate: 3e-5, train batch size: 16
 python finetuning.py \
@@ -88,7 +88,7 @@ python finetuning.py \
     --learning_rate " 3e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 2, Learning rate: 2e-5, train batch size: 16
 python finetuning.py \
@@ -101,7 +101,7 @@ python finetuning.py \
     --learning_rate " 2e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 3, Learning rate: 2e-5, train batch size: 16
 python finetuning.py \
@@ -114,7 +114,7 @@ python finetuning.py \
     --learning_rate " 2e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 4, Learning rate: 2e-5, train batch size: 16
 python finetuning.py \
@@ -127,7 +127,7 @@ python finetuning.py \
     --learning_rate " 2e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 2, Learning rate: 5e-5, train batch size: 32
 python finetuning.py \
@@ -140,7 +140,7 @@ python finetuning.py \
     --learning_rate " 5e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 3, Learning rate: 5e-5, train batch size: 32
 python finetuning.py \
@@ -153,7 +153,7 @@ python finetuning.py \
     --learning_rate " 5e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 4, Learning rate: 5e-5, train batch size: 32
 python finetuning.py \
@@ -166,7 +166,7 @@ python finetuning.py \
     --learning_rate " 5e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 2, Learning rate: 3e-5, train batch size: 32
 python finetuning.py \
@@ -179,7 +179,7 @@ python finetuning.py \
     --learning_rate " 3e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 3, Learning rate: 3e-5, train batch size: 32
 python finetuning.py \
@@ -192,7 +192,7 @@ python finetuning.py \
     --learning_rate " 3e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 4, Learning rate: 3e-5, train batch size: 32
 python finetuning.py \
@@ -205,7 +205,7 @@ python finetuning.py \
     --learning_rate " 3e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 2, Learning rate: 2e-5, train batch size: 32
 python finetuning.py \
@@ -218,7 +218,7 @@ python finetuning.py \
     --learning_rate " 2e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 3, Learning rate: 2e-5, train batch size: 32
 python finetuning.py \
@@ -231,7 +231,7 @@ python finetuning.py \
     --learning_rate " 2e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 # Epochs: 4, Learning rate: 2e-5, train batch size: 32
 python finetuning.py \

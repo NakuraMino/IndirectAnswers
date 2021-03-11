@@ -59,6 +59,8 @@ class CircaDataset(Dataset):
         judgement = self.data.loc[idx]["judgements"]
         label1 = self.labelToIdx(self.data.loc[idx]["goldstandard1"])
         label2 = self.labelToIdx(self.data.loc[idx]["goldstandard2"])
+        print("Here's label1:", label1)
+        print("Here's label2:", label2)
         question = str(self.data.loc[idx]["context"]) + \
                    " [SEP] " + str(self.data.loc[idx]['question-X']) + \
                    " [SEP] " + str(self.data.loc[idx]['answer-Y'])
@@ -74,6 +76,8 @@ class CircaDataset(Dataset):
         else:
             header_to_data["goldstandard1"] = label1
             header_to_data["goldstandard2"] = label2
+
+        print()
         return header_to_data
 
     def labelToIdx(self, label):
@@ -85,6 +89,8 @@ class CircaDataset(Dataset):
         """
         if self.use_tokenizer: 
             return self.tokenizer(label, return_tensors="pt")
+
+        print("Here's the label:", label)
 
         if label == 'Yes':
             return 0

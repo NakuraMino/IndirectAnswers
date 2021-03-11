@@ -29,7 +29,10 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
 
     for batch in tqdm(dev_dataloader, desc="Checking dev model accuracy..."):
         with torch.no_grad():
-            input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+            if args.type:
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+            else:
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)
@@ -87,8 +90,8 @@ def main():
 
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
     model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    #device = "cpu"
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     
     model.zero_grad()
     model.to(device)
@@ -121,11 +124,14 @@ def main():
          
         for step, batch in enumerate(epoch_iterator):
             # Strict case
+            print("Checking args.type:", args.type)
+            print("IASJDFSDIAFJSDAIFDSJUGIFIAGSDFISDAJIFDAS")
             if args.type:
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
             # Relaxed case
             else:
-                input_ids, atten, labels, token_type_id = batch['input-ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
+                print("IN RELAXED CASE")
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)
@@ -135,6 +141,9 @@ def main():
             #input_ids = torch.reshape(input_ids, (1, -1))
             #atten = torch.reshape(atten, (1, -1))
             #token_type_id = torch.reshape(token_type_id, (1, -1))
+
+            print("Here's the labels:", labels)
+            print("Here's batch:", batch)
 
             outputs = model(input_ids=input_ids, token_type_ids=token_type_id, attention_mask=atten, labels=labels)
 

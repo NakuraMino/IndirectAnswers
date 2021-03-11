@@ -32,7 +32,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_relaxed_e3_lr5e-5_b16" \
-    --type false\
+    --type false \
     --batch_size "16" \
     --epochs "3" \
     --learning_rate " 5e-5" \
@@ -262,6 +262,6 @@ python finetuning.py \
     --learning_rate " 2e-5" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "9"
+    --num_labels "6"
 
 echo "Finished finetuning CIRCA with relaxed labels..."

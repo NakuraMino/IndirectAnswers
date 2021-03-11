@@ -97,13 +97,13 @@ class CircaDataset(Dataset):
         elif label == "Other":
             return 4
         elif label == 'Probably yes / sometimes yes':
-            return 5
-        elif label == "Probably no":
             return 6
-        elif label == "I am not sure how X will interpret Y's answer":
+        elif label == "Probably no":
             return 7
-        else: # nan/NA case
+        elif label == "I am not sure how X will interpret Y's answer":
             return 8
+        else: # nan/NA case
+            return 5
 
     def collate_fn(self, batch):
         """

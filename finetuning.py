@@ -66,6 +66,7 @@ def main():
     parser.add_argument('--test_data', type=Path, required=True)
     parser.add_argument('--model_name', type=str, required=True)
     parser.add_argument('--output_dir', type=Path, required=True)
+    parser.add_argument('--type', type=bool, required=True, help="relaxed vs. strict case")
     parser.add_argument('--epochs', type=int, default=20, help="number of epochs to train for")
     parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
     parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
@@ -118,8 +119,13 @@ def main():
         model.train()
        
          
-        for step, batch in enumerate(epoch_iterator): 
-            input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+        for step, batch in enumerate(epoch_iterator):
+            # Strict case
+            if args.type:
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+            # Relaxed case
+            else:
+                input_ids, atten, labels, token_type_id = batch['input-ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)

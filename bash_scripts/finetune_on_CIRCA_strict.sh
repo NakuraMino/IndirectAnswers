@@ -18,6 +18,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e2_lr5e-5_b16" \
+    --type true \
     --batch_size "16" \
     --epochs "2" \
     --learning_rate " 5e-5" \
@@ -31,6 +32,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e3_lr5e-5_b16" \
+    --type true \
     --batch_size "16" \
     --epochs "3" \
     --learning_rate " 5e-5" \
@@ -44,6 +46,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e4_lr5e-5_b16" \
+    --type true \
     --batch_size "16" \
     --epochs "4" \
     --learning_rate " 5e-5" \
@@ -57,6 +60,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e2_lr3e-5_b16" \
+    --type true \
     --batch_size "16" \
     --epochs "2" \
     --learning_rate " 3e-5" \
@@ -70,6 +74,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e3_lr3e-5_b16" \
+    --type true \
     --batch_size "16" \
     --epochs "3" \
     --learning_rate " 3e-5" \
@@ -83,6 +88,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e4_lr3e-5_b16" \
+    --type true \
     --batch_size "16" \
     --epochs "4" \
     --learning_rate " 3e-5" \
@@ -96,6 +102,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e2_lr2e-5_b16" \
+    --type true \
     --batch_size "16" \
     --epochs "2" \
     --learning_rate " 2e-5" \
@@ -109,6 +116,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e3_lr2e-5_b16" \
+    --type true \
     --batch_size "16" \
     --epochs "3" \
     --learning_rate " 2e-5" \
@@ -122,6 +130,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e4_lr2e-5_b16" \
+    --type true \
     --batch_size "16" \
     --epochs "4" \
     --learning_rate " 2e-5" \
@@ -135,6 +144,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e2_lr5e-5_b32" \
+    --type true \
     --batch_size "32" \
     --epochs "2" \
     --learning_rate " 5e-5" \
@@ -148,6 +158,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e3_lr5e-5_b32" \
+    --type true \
     --batch_size "32" \
     --epochs "3" \
     --learning_rate " 5e-5" \
@@ -161,6 +172,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e4_lr5e-5_b32" \
+    --type true \
     --batch_size "32" \
     --epochs "4" \
     --learning_rate " 5e-5" \
@@ -174,6 +186,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e2_lr3e-5_b32" \
+    --type true \
     --batch_size "32" \
     --epochs "2" \
     --learning_rate " 3e-5" \
@@ -187,6 +200,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e3_lr3e-5_b32" \
+    --type true \
     --batch_size "32" \
     --epochs "3" \
     --learning_rate " 3e-5" \
@@ -200,6 +214,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e4_lr3e-5_b32" \
+    --type true \
     --batch_size "32" \
     --epochs "4" \
     --learning_rate " 3e-5" \
@@ -213,6 +228,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e2_lr2e-5_b32" \
+    --type true \
     --batch_size "32" \
     --epochs "2" \
     --learning_rate " 2e-5" \
@@ -226,6 +242,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e3_lr2e-5_b32" \
+    --type true \
     --batch_size "32" \
     --epochs "3" \
     --learning_rate " 2e-5" \
@@ -239,6 +256,7 @@ python finetuning.py \
     --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
     --test_data "$BASE_DIR/data/circa-data-test.tsv" \
     --model_name "CIRCA_BERT_strict_e4_lr2e-5_b32" \
+    --type true \
     --batch_size "32" \
     --epochs "4" \
     --learning_rate " 2e-5" \

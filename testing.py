@@ -33,7 +33,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_path', type=Path, required=True)
     parser.add_argument('--test_data', type=Path, required=True)
     parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
-    # parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
+    parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
     # parser.add_argument('--num_labels', type=int, required=True, help="choose the number of labels for the experiment")
     args = parser.parse_args()
     

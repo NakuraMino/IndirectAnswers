@@ -22,6 +22,17 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
 
     dev_dataloader = dataloader.getCircaDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, use_tokenizer=False, tokenizer=tokenizer)
 
+    # Loads a dataset depending on the number
+    # 1: Circa, 2: BoolQ, 3: MNLI, 4: DIS
+    if args.dataset_type == 1:
+        dev_dataloader = dataloader.getCircaDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, use_tokenizer=False, tokenizer=tokenizer)
+    elif args.dataset_type == 2:
+        dev_dataloader = dataloader.getBOOLQDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4)
+    elif args.dataset_type == 3:
+        dev_dataloader = dataloader.getMNLIDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4)
+    else:
+        print("Not implemented yet")
+    
     dev_loss = 0.0
     nb_dev_step = 0
 
@@ -29,10 +40,15 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
 
     for batch in tqdm(dev_dataloader, desc="Checking dev model accuracy..."):
         with torch.no_grad():
-            if args.num_labels == 9:
-                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
-            else:
-                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
+            if args.dataset_type == 1:
+                # Strict case
+                if args.num_labels == 9:
+                    input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+                # Relaxed case
+                else:
+                    input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
+            elif args.dataset_type == 2:
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)
@@ -66,9 +82,9 @@ def main():
     parser = ArgumentParser()
     parser.add_argument('--train_data', type=Path, required=True)
     parser.add_argument('--dev_data', type=Path, required=True)
-    parser.add_argument('--test_data', type=Path, required=True)
     parser.add_argument('--model_name', type=str, required=True)
     parser.add_argument('--output_dir', type=Path, required=True)
+    parser.add_argument('--dataset_type', type=int, required=True)
     parser.add_argument('--epochs', type=int, default=20, help="number of epochs to train for")
     parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
     parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
@@ -89,8 +105,8 @@ def main():
 
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
     model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    #device = "cpu"
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     
     model.zero_grad()
     model.to(device)
@@ -113,7 +129,17 @@ def main():
         #     shuffle=False,
         # )
         #train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1, use_tokenizer=False)
-        train_dataloader = dataloader.getCircaDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, use_tokenizer=False, tokenizer=tokenizer)
+
+        # Loads a dataset depending on the number
+        # 1: Circa, 2: BoolQ, 3: MNLI, 4: DIS
+        if args.dataset_type == 1:
+            train_dataloader = dataloader.getCircaDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, use_tokenizer=False, tokenizer=tokenizer)
+        elif args.dataset_type == 2:
+            train_dataloader = dataloader.getBOOLQDataloader(args.train_data, batch_size=args.batch_size, num_workers=1)
+        elif args.dataset_type == 3:
+            train_dataloader = dataloader.getMNLIDataloader(args.train_data, batch_size=args.batch_size, num_workers=1)
+        else:
+            print("Not implemented yet")
 
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")                                       
         tr_loss = 0
@@ -121,12 +147,15 @@ def main():
         model.train()
         
         for step, batch in enumerate(epoch_iterator):
-            # Strict case
-            if args.num_labels == 9:
-                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
-            # Relaxed case
-            else:
-                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
+            if args.dataset_type == 1:
+                # Strict case
+                if args.num_labels == 9:
+                    input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+                # Relaxed case
+                else:
+                    input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
+            elif args.dataset_type == 2:
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)

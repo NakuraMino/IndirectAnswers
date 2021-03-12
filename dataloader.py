@@ -204,7 +204,7 @@ class BOOLQDataset(Dataset):
         batch_dict = dict()
         batch_dict['answer'] = labels
         batch_dict['strings'] = input_list
-        indexed_tokens = self.tokenizer(input_list, padding=True, return_tensors="pt")
+        indexed_tokens = self.tokenizer(input_list, padding=True, truncation=True, return_tensors="pt")
         for key in indexed_tokens:
             batch_dict[key] = indexed_tokens[key]
         return batch_dict

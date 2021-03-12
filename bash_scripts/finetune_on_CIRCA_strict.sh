@@ -23,8 +23,8 @@ for lr in $LearningRates; do
             python finetuning.py \
                 --train_data "$BASE_DIR/data/circa-data-train.tsv" \
                 --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
-                --test_data "$BASE_DIR/data/circa-data-test.tsv" \
                 --model_name "CIRCA_BERT_strict_e${e}_lr${lr}_b${b}" \
+                --dataset_type "1" \
                 --batch_size "$b" \
                 --epochs "$e" \
                 --learning_rate "$lr" \

@@ -14,7 +14,7 @@ BatchSize="16 32"
 
 ## Modify the script so that we can make a new directory for the different BERT experiments
 ## For label of size 6
-echo "Finetuning on CIRCA with relaxed labels..."
+echo "Finetuning on MNLI..."
 
 # Running through the different combinations
 for lr in $LearningRates; do
@@ -25,7 +25,7 @@ for lr in $LearningRates; do
                 --train_data "$BASE_DIR/data/circa-data-train.tsv" \
                 --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
                 --model_name "CIRCA_BERT_relaxed_e${e}_lr${lr}_b${b}" \
-                --dataset_type "1" \
+                --dataset_type "3" \
                 --batch_size "$b" \
                 --epochs "$e" \
                 --learning_rate "$lr" \
@@ -36,4 +36,4 @@ for lr in $LearningRates; do
     done
 done
 
-echo "Finished finetuning CIRCA with relaxed labels..."
+echo "Finished finetuning on MNLI..."

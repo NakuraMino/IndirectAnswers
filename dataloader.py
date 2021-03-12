@@ -256,23 +256,18 @@ class MNLIDataset(Dataset):
             }
         """
         batch_dict = dict()
-        sent_one_list = list()
-        sent_two_list = list()
+        sentence_list = list()
         labels = torch.zeros((len(batch),)).long()
         idx = 0
         for data in batch:
-            sent_one_list += [data["sentence1"]]
-            sent_two_list += [data["sentence2"]]
+            sentence_list += [str(data["sentence1"]  + " [SEP] " + data["sentence2"])]
             labels[idx] = data["gold_label"]
             idx += 1
-        sent_one_tokenized = self.tokenizer(sent_one_list, padding=True, return_tensors="pt")
-        sent_two_tokenized = self.tokenizer(sent_two_list, padding=True, return_tensors="pt")
-        for key in sent_one_tokenized:
-            batch_dict["sent1" + key] = sent_one_tokenized[key]
-            batch_dict["sent2" + key] = sent_two_tokenized[key]
+        sentence_tokenized = self.tokenizer(sentence_list, padding=True, return_tensors="pt")
+        for key in sentence_tokenized:
+            batch_dict["sentence_" + key] = sentence_tokenized[key]
         batch_dict["gold_labels"] = labels
-        batch_dict["sentence1"] = sent_one_list
-        batch_dict["sentence2"] = sent_two_list
+        batch_dict["sentence"] = sentence_list
         return batch_dict
 
     def labelToIdx(self, label):
@@ -342,7 +337,7 @@ def getMNLIDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, tok
                       collate_fn=dataset.collate_fn,
                       num_workers=num_workers)
 
-if False: #__name__ == "__main__":
+if __name__ == "__main__":
     #testing MNLI dataset
     md = MNLIDataset("data/mnli/multinli_1.0_train.jsonl")
     dataloader = getMNLIDataloader("data/mnli/multinli_1.0_train.jsonl", batch_size=2, num_workers=1)
@@ -363,7 +358,7 @@ if False: #__name__ == "__main__":
     print(batch)
 
 
-if __name__ == "__main__":
+if False: #__name__ == "__main__":
     # testing circa dataset
     # some really simple testing 
     dataset = CircaDataset('./data/circa-data.tsv', mode='q')

@@ -63,9 +63,11 @@ class CircaDataset(Dataset):
         label1 = self.labelToIdx(self.data.loc[idx]["goldstandard1"])
         label2 = self.labelToIdx(self.data.loc[idx]["goldstandard2"])    
         if self.mode == "a":
-            question = str(self.data.loc[idx]['answer-Y'])
+            question = str(self.data.loc[idx]["context"]) + \
+                " [SEP] " +str(self.data.loc[idx]['answer-Y'])
         elif self.mode == "q": 
-            question = str(self.data.loc[idx]['question-X'])
+            question = str(self.data.loc[idx]["context"]) + \
+                " [SEP] " + str(self.data.loc[idx]['question-X'])
         else:
             question = str(self.data.loc[idx]["context"]) + \
                 " [SEP] " + str(self.data.loc[idx]['question-X']) + \

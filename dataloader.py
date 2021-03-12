@@ -24,16 +24,19 @@ class CircaDataset(Dataset):
     dataset class for the circa dataset 
     """
 
-    def __init__(self, file_path, tokenizer=None, use_tokenizer=False):
+    def __init__(self, file_path, tokenizer=None, mode=None):
         """
         @param file_path: the path to a circa.tsv file
         @param tokenizer (default=None): an optional tokenizer to convert text 
                                          to tokens. If none is passed in, uses 
-                                         the bert-base-uncased tokenizer. 
+                                         the bert-base-uncased tokenizer.
+        @param mode (default=None): sets whether we want to use the full input (question+response)
+                                    or just question or just answer. To use only questions, use mode="q",
+                                    and mode="a" for just answers 
         """
         self.file_path = file_path
         self.data = pd.read_csv(file_path, sep='\t')
-        self.use_tokenizer = use_tokenizer
+        self.mode = mode
         if tokenizer == None:
             self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         else:
@@ -58,23 +61,23 @@ class CircaDataset(Dataset):
         """
         judgement = self.data.loc[idx]["judgements"]
         label1 = self.labelToIdx(self.data.loc[idx]["goldstandard1"])
-        label2 = self.labelToIdx(self.data.loc[idx]["goldstandard2"])
-        question = str(self.data.loc[idx]["context"]) + \
-                   " [SEP] " + str(self.data.loc[idx]['question-X']) + \
-                   " [SEP] " + str(self.data.loc[idx]['answer-Y'])
+        label2 = self.labelToIdx(self.data.loc[idx]["goldstandard2"])    
+        if self.mode == "a":
+            question = str(self.data.loc[idx]['answer-Y'])
+        elif self.mode == "q": 
+            question = str(self.data.loc[idx]['question-X'])
+        else:
+            question = str(self.data.loc[idx]["context"]) + \
+                " [SEP] " + str(self.data.loc[idx]['question-X']) + \
+                " [SEP] " + str(self.data.loc[idx]['answer-Y'])
+        print(question)
         indexed_tokens = self.tokenizer(question, return_tensors="pt")
         header_to_data = {
             "judgements": judgement,
         }
         header_to_data['question'] = question
-        if self.use_tokenizer:
-            for key in label1:
-                header_to_data["goldstandard1_" + key] = label1[key]
-                header_to_data["goldstandard2_" + key] = label2[key]
-        else:
-            header_to_data["goldstandard1"] = label1
-            header_to_data["goldstandard2"] = label2
-
+        header_to_data["goldstandard1"] = label1
+        header_to_data["goldstandard2"] = label2
         return header_to_data
 
     def labelToIdx(self, label):
@@ -84,9 +87,6 @@ class CircaDataset(Dataset):
         @param label: the gold standard label
         @return: a value 0 - 8 which encodes the label
         """
-        if self.use_tokenizer: 
-            return self.tokenizer(label, return_tensors="pt")
-
         if label == 'Yes':
             return 0
         elif label == 'No':
@@ -291,7 +291,7 @@ class MNLIDataset(Dataset):
         else:
             return 3
 
-def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, tokenizer=None, use_tokenizer=False):
+def getCircaDataloader(file_path, batch_size=16, num_workers=4, mode=None, shuffle=True, tokenizer=None):
     """
     creates a dataset and returns a dataloader 
 
@@ -301,7 +301,7 @@ def getCircaDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, to
     @param shuffle (default=True): shuffle dataset or not (True or False value)
     @return: torch.utils.data.DataLoader object    
     """
-    dataset = CircaDataset(file_path, tokenizer=tokenizer, use_tokenizer=use_tokenizer)
+    dataset = CircaDataset(file_path, mode=mode, tokenizer=tokenizer)
     return DataLoader(dataset,
                       batch_size=batch_size,
                       shuffle=shuffle,
@@ -342,7 +342,7 @@ def getMNLIDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, tok
                       collate_fn=dataset.collate_fn,
                       num_workers=num_workers)
 
-if __name__ == "__main__":
+if False: #__name__ == "__main__":
     #testing MNLI dataset
     md = MNLIDataset("data/mnli/multinli_1.0_train.jsonl")
     dataloader = getMNLIDataloader("data/mnli/multinli_1.0_train.jsonl", batch_size=2, num_workers=1)
@@ -363,15 +363,15 @@ if False: #__name__ == "__main__":
     print(batch)
 
 
-if False: #__name__ == "__main__":
+if __name__ == "__main__":
     # testing circa dataset
     # some really simple testing 
-    dataset = CircaDataset('./data/circa-data.tsv')
+    dataset = CircaDataset('./data/circa-data.tsv', mode='q')
     length = len(dataset)
     print(length)
     for key in dataset[0]:
         print(key)
-    dataloader = getCircaDataloader('./data/circa-data.tsv', batch_size=2, num_workers=1, use_tokenizer=False)
+    dataloader = getCircaDataloader('./data/circa-data.tsv', batch_size=2, num_workers=1, mode='a')
     dl_iter = iter(dataloader)
     batch = next(dl_iter)
     print(batch)

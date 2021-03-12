@@ -24,7 +24,7 @@ for lr in $LearningRates; do
             python finetuning.py \
                 --train_data "$BASE_DIR/data/BoolQ/train.jsonl" \
                 --dev_data "$BASE_DIR/data/BoolQ/dev.jsonl" \
-                --model_name "MNLI_BERT_e${e}_lr${lr}_b${b}" \
+                --model_name "BOOLQ_BERT_e${e}_lr${lr}_b${b}" \
                 --dataset_type "2" \
                 --batch_size "$b" \
                 --epochs "$e" \

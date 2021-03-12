@@ -25,7 +25,6 @@ for lr in $LearningRates; do
                 --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
                 --test_data "$BASE_DIR/data/circa-data-test.tsv" \
                 --model_name "CIRCA_BERT_strict_e${e}_lr${lr}_b${b}" \
-                --type true \
                 --batch_size "$b" \
                 --epochs "$e" \
                 --learning_rate "$lr" \

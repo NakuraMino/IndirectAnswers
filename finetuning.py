@@ -29,7 +29,10 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
 
     for batch in tqdm(dev_dataloader, desc="Checking dev model accuracy..."):
         with torch.no_grad():
-            input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+            if args.num_labels == 9:
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+            else:
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)
@@ -66,7 +69,6 @@ def main():
     parser.add_argument('--test_data', type=Path, required=True)
     parser.add_argument('--model_name', type=str, required=True)
     parser.add_argument('--output_dir', type=Path, required=True)
-    parser.add_argument('--type', type=bool, required=True, help="relaxed vs. strict case")
     parser.add_argument('--epochs', type=int, default=20, help="number of epochs to train for")
     parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
     parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
@@ -117,15 +119,14 @@ def main():
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
         model.train()
-       
-         
+        
         for step, batch in enumerate(epoch_iterator):
             # Strict case
-            if args.type:
+            if args.num_labels == 9:
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
             # Relaxed case
             else:
-                input_ids, atten, labels, token_type_id = batch['input-ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)
@@ -149,7 +150,7 @@ def main():
 
             global_step += 1
             epoch_iterator.set_description(f"Loss: {total_loss / (global_step + 1)}")
-         
+            
         min_loss = float('inf')
         validate(args, model, tokenizer, device, epoch, min_loss, model_path)
 

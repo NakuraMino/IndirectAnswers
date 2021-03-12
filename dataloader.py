@@ -74,6 +74,7 @@ class CircaDataset(Dataset):
         else:
             header_to_data["goldstandard1"] = label1
             header_to_data["goldstandard2"] = label2
+
         return header_to_data
 
     def labelToIdx(self, label):

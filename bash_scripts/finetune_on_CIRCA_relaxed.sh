@@ -16,6 +16,7 @@ BatchSize="16 32"
 ## For label of size 6
 echo "Finetuning on CIRCA with relaxed labels..."
 
+# Running through the different combinations
 for lr in $LearningRates; do
     for e in $Epochs; do
         for b in $BatchSize; do
@@ -25,7 +26,6 @@ for lr in $LearningRates; do
                 --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
                 --test_data "$BASE_DIR/data/circa-data-test.tsv" \
                 --model_name "CIRCA_BERT_relaxed_e${e}_lr${lr}_b${b}" \
-                --type false \
                 --batch_size "$b" \
                 --epochs "$e" \
                 --learning_rate "$lr" \

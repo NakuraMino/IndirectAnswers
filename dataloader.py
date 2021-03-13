@@ -8,6 +8,7 @@ Useful links:
 - https://github.com/google-research-datasets/boolean-questions
 - https://github.com/google-research-datasets/circa
 - https://cims.nyu.edu/~sbowman/multinli/
+- https://github.com/windweller/DisExtract
 """
 
 import torch 
@@ -63,15 +64,15 @@ class CircaDataset(Dataset):
         label1 = self.labelToIdx(self.data.loc[idx]["goldstandard1"])
         label2 = self.labelToIdx(self.data.loc[idx]["goldstandard2"])    
         if self.mode == "a":
-            question = str(self.data.loc[idx]['answer-Y'])
+            question = str(self.data.loc[idx]["context"]) + \
+                " [SEP] " +str(self.data.loc[idx]['answer-Y'])
         elif self.mode == "q": 
-            question = str(self.data.loc[idx]['question-X'])
+            question = str(self.data.loc[idx]["context"]) + \
+                " [SEP] " + str(self.data.loc[idx]['question-X'])
         else:
             question = str(self.data.loc[idx]["context"]) + \
                 " [SEP] " + str(self.data.loc[idx]['question-X']) + \
                 " [SEP] " + str(self.data.loc[idx]['answer-Y'])
-        print(question)
-        indexed_tokens = self.tokenizer(question, return_tensors="pt")
         header_to_data = {
             "judgements": judgement,
         }
@@ -286,6 +287,110 @@ class MNLIDataset(Dataset):
         else:
             return 3
 
+class DISDataset(Dataset):
+    """
+    dataset class for the DIS dataset
+
+    To download the datasets, run:
+    wget https://dissent.s3-us-west-2.amazonaws.com/data/discourse_EN_FIVE_and_but_because_if_when_2017dec12_train.tsv
+    or change dec12_train to dec12_valid or dec12_test to get the appropriate dataset
+    
+    More download links here:
+    https://s3-us-west-2.amazonaws.com/dissent/
+     
+    """
+
+    def __init__(self, file_path, tokenizer=None):
+        """
+        @param file_path: the path to a DIS tsv file
+        @param tokenizer (default=None): an optional tokenizer to convert text 
+                                         to tokens. If none is passed in, uses 
+                                         the bert-base-uncased tokenizer.
+        """
+        self.file_path = file_path
+        self.data = pd.read_csv(file_path, sep='\t', header=None, names=['input1', 'input2', 'label'])
+        if tokenizer == None:
+            self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        else:
+            self.tokenizer = tokenizer
+            
+    def __len__(self):
+        return self.data.shape[0]
+
+    def __getitem__(self, idx): 
+        """
+        @param idx: index into the dataset
+
+        @return: dictionary mapping from th column titles to the value at each column + row(idx) pair
+                dictionary is in the form:
+                {
+                    'sentence': string with the two input sentences concatenated by a [SEP] token,
+                    'label': int representing the label idx
+                }
+        """
+        label = self.labelToIdx(self.data.loc[idx]["label"]) 
+        sentence = str(self.data.loc[idx]["input1"]) + \
+            " [SEP] " + str(self.data.loc[idx]['input2'])
+
+        indexed_tokens = self.tokenizer(sentence, return_tensors="pt")
+        header_to_data = {
+            'label': label,
+            'sentence': sentence
+        }
+        return header_to_data
+
+    def labelToIdx(self, label):
+        """
+        maps a label from the DIS dataset to a numerical value 
+        
+        @param label: the gold standard label
+        @return: a value 0 - 5 which encodes the label
+        """
+        if label == 'because':
+            return 0
+        elif label == 'but':
+            return 1
+        elif label == 'if':
+            return 2
+        elif label == 'when':
+            return 3
+        elif label == 'and':
+            return 4
+        else:
+            # never expect this to happen 
+            return 5
+        
+    def collate_fn(self, batch):
+        """
+        @param batch: list of datapoints (dictionaries), each from __getitem__
+                     with length N 
+        @returns: a dictionary with the following keys:
+            { "sentences": list of length N of input sentences (strings)
+              "labels": (N,) torch.LongTensor of labels
+              "input ids": (N,K) torch.floatTensor of tokens representing the input question 
+              "token_type_ids": (N,K) torch.LongTensor of the token types 
+              "attention_mask": (N,K) torch.LongTensor of the attention masks
+            }
+            where K is the maximum length input string.
+        """
+        batch_dict = dict()
+        batch_size = len(batch)
+        # label
+        batch_dict["labels"] = torch.zeros((len(batch),)).long()
+        idx = 0
+        for data in batch:
+            batch_dict["labels"][idx] = data['label']
+            idx += 1
+        # input strings
+        sentence_list = list()
+        for data in batch:
+            sentence_list.append(data["sentence"])
+        batch_dict['sentences'] = sentence_list
+        indexed_tokens = self.tokenizer(sentence_list, padding=True, return_tensors="pt")
+        for key in indexed_tokens:
+            batch_dict[key] = indexed_tokens[key]
+        return batch_dict
+
 def getCircaDataloader(file_path, batch_size=16, num_workers=4, mode=None, shuffle=True, tokenizer=None):
     """
     creates a dataset and returns a dataloader 
@@ -337,7 +442,35 @@ def getMNLIDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, tok
                       collate_fn=dataset.collate_fn,
                       num_workers=num_workers)
 
+def getDISDataloader(file_path, batch_size=16, num_workers=4, shuffle=True, tokenizer=None):
+    """
+    creates a dataset and returns a dataloader 
+
+    @param file_path: the path to a train.jsonl file
+    @param batch_size (default=16): size of each batch
+    @param num_workers (default=4): the number of workers
+    @param shuffle (default=True): shuffle dataset or not (True or False value)
+    @return: torch.utils.data.DataLoader object    
+    """
+    dataset = DISDataset(file_path, tokenizer=tokenizer)
+    return DataLoader(dataset,
+                      batch_size=batch_size,
+                      shuffle=shuffle,
+                      collate_fn=dataset.collate_fn,
+                      num_workers=num_workers)
+
+
 if __name__ == "__main__":
+    dd = DISDataset('data/DIS/discourse_EN_FIVE_and_but_because_if_when_2017dec12_valid.tsv')
+    for key in dd[0]:
+        print(f"{key}: {dd[0][key]}")
+    dataloader = getDISDataloader('data/DIS/discourse_EN_FIVE_and_but_because_if_when_2017dec12_valid.tsv', batch_size=2, num_workers=1)
+    dl_iter = iter(dataloader)
+    batch= next(dl_iter)
+    for key in batch:
+        print(f"{key}: {batch[key]}")
+
+if False: #__name__ == "__main__":
     #testing MNLI dataset
     md = MNLIDataset("data/mnli/multinli_1.0_train.jsonl")
     dataloader = getMNLIDataloader("data/mnli/multinli_1.0_train.jsonl", batch_size=2, num_workers=1)

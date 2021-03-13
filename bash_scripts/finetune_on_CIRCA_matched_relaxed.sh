@@ -24,7 +24,7 @@ for i in ${!Modes[@]}; do
     python finetuning.py \
         --train_data "$BASE_DIR/data/CIRCA/circa-data-train.tsv" \
         --dev_data "$BASE_DIR/data/CIRCA/circa-data-dev.tsv" \
-        --model_name "CIRCA_BERT_matched_relaxed_e3_lr${lr}_b32" \
+        --model_name "CIRCA_BERT_matched_relaxed_${mode}_e3_lr${lr}_b32" \
         --dataset_type "CIRCA" \
         --batch_size "32" \
         --epochs "3" \

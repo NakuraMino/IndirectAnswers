@@ -308,7 +308,7 @@ class DISDataset(Dataset):
                                          the bert-base-uncased tokenizer.
         """
         self.file_path = file_path
-        self.data = pd.read_csv(file_path, sep='\t', header=None, names=['input1', 'input2', 'label'])
+        self.data = pd.read_csv(file_path, sep='\t', nrows=400000, header=None, names=['input1', 'input2', 'label'])
         if tokenizer == None:
             self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         else:
@@ -464,6 +464,7 @@ if __name__ == "__main__":
     dd = DISDataset('data/DIS/discourse_EN_FIVE_and_but_because_if_when_2017dec12_valid.tsv')
     for key in dd[0]:
         print(f"{key}: {dd[0][key]}")
+    print("length", len(dd))
     dataloader = getDISDataloader('data/DIS/discourse_EN_FIVE_and_but_because_if_when_2017dec12_valid.tsv', batch_size=2, num_workers=1)
     dl_iter = iter(dataloader)
     batch= next(dl_iter)

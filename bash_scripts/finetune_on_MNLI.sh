@@ -23,6 +23,7 @@ python finetuning.py \
 --dev_data "$BASE_DIR/data/multinli_1.0/multinli_1.0_dev_matched.jsonl" \
 --model_name "MNLI_BERT_e3_lr2e-5_b16" \
 --dataset_type "MNLI" \
+--multi_gpu_on \
 --batch_size "16" \
 --epochs "3" \
 --learning_rate " 2e-5" \

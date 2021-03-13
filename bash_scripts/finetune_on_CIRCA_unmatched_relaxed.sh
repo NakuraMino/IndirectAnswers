@@ -3,6 +3,7 @@
 ## File for finetuning on the unmatched, relaxed dataset
 
 BASE_DIR=".."  # IndirectAnswers directory
+UNMATCHED_DIR="$BASE_DIR/data/CIRCA/unmatched/scenario"
 OUTPUT_DIR="$BASE_DIR/models/"
 MODEL_TYPE="bert-base-cased"
 
@@ -21,10 +22,10 @@ for i in ${!Modes[@]}; do
     for j in $ScenarioNum; do # 10 iterations, leaving a different scenario out each time
         mode=${Modes[i]}
         lr=${LearningRates[i]}
-        echo "STARTING... Mode: $mode, Learning rate: $lr, Iter: $j"
+        echo "STARTING... Mode: $mode, Learning rate: $lr, Scenario: $j"
         python finetuning.py \
-            --train_data "$BASE_DIR/data/unmatched-circa-data-train.tsv" \
-            --dev_data "$BASE_DIR/data/unmatched-circa-data-dev.tsv" \
+            --train_data "${UNMATCHED_DIR}${j}/circa-data-train.tsv" \
+            --dev_data "$UNMATCHED_DIR${j}/circa-data-dev.tsv" \
             --model_name "CIRCA_BERT_unmatched_relaxed_e3_lr${lr}_b32" \
             --dataset_type "CIRCA" \
             --batch_size "32" \

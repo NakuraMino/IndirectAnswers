@@ -22,8 +22,8 @@ for i in ${!Modes[@]}; do
     lr=${LearningRates[i]}
     echo "STARTING... Mode: $mode, Learning rate: $lr"
     python finetuning.py \
-        --train_data "$BASE_DIR/data/circa-data-train.tsv" \
-        --dev_data "$BASE_DIR/data/circa-data-dev.tsv" \
+        --train_data "$BASE_DIR/data/CIRCA/circa-data-train.tsv" \
+        --dev_data "$BASE_DIR/data/CIRCA/circa-data-dev.tsv" \
         --model_name "CIRCA_BERT_matched_strict_e3_lr${lr}_b32" \
         --dataset_type "CIRCA" \
         --batch_size "32" \

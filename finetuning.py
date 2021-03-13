@@ -22,11 +22,11 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
 
     # Loads a dataset depending on the number
     # 1: Circa, 2: BoolQ, 3: MNLI, 4: DIS
-    if args.dataset_type == 1:
+    if args.dataset_type == 'CIRCA':
         dev_dataloader = dataloader.getCircaDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
-    elif args.dataset_type == 2:
+    elif args.dataset_type == 'BOOLQ':
         dev_dataloader = dataloader.getBOOLQDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
-    elif args.dataset_type == 3:
+    elif args.dataset_type == 'MNLI':
         dev_dataloader = dataloader.getMNLIDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
     else:
         print("Not implemented yet")
@@ -38,16 +38,16 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
 
     for batch in tqdm(dev_dataloader, desc="Checking dev model accuracy..."):
         with torch.no_grad():
-            if args.dataset_type == 1:
+            if args.dataset_type == 'CIRCA':
                 # Strict case
                 if args.num_labels == 9:
                     input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
                 # Relaxed case
                 else:
                     input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
-            elif args.dataset_type == 2:
+            elif args.dataset_type == 'BOOLQ':
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
-            elif args.dataset_type == 3:
+            elif args.dataset_type == 'MNLI':
                 input_ids, atten, labels, token_type_id = batch['sent1input_ids'], batch['sent1attention_mask'], batch['gold_labels'], batch['sent1token_type_ids']
 
             input_ids = input_ids.to(device)
@@ -84,7 +84,7 @@ def main():
     parser.add_argument('--dev_data', type=Path, required=True)
     parser.add_argument('--model_name', type=str, required=True)
     parser.add_argument('--output_dir', type=Path, required=True)
-    parser.add_argument('--dataset_type', type=int, required=True)
+    parser.add_argument('--dataset_type', type=str, required=True)
     parser.add_argument('--epochs', type=int, default=20, help="number of epochs to train for")
     parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
     parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
@@ -132,12 +132,12 @@ def main():
 
         # Loads a dataset depending on the number
         # 1: Circa, 2: BoolQ, 3: MNLI, 4: DIS
-        if args.dataset_type == 1:
+        if args.dataset_type == 'CIRCA':
             train_dataloader = dataloader.getCircaDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, tokenizer=tokenizer)
-        elif args.dataset_type == 2:
+        elif args.dataset_type == 'BOOLQ':
             print("BOOLQ")
             train_dataloader = dataloader.getBOOLQDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, tokenizer=tokenizer)
-        elif args.dataset_type == 3:
+        elif args.dataset_type == 'MNLI':
             train_dataloader = dataloader.getMNLIDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, tokenizer=tokenizer)
         else:
             print("Not implemented yet")
@@ -148,16 +148,16 @@ def main():
         model.train()
         
         for step, batch in enumerate(epoch_iterator):
-            if args.dataset_type == 1:
+            if args.dataset_type == 'CIRCA':
                 # Strict case
                 if args.num_labels == 9:
                     input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
                 # Relaxed case
                 else:
                     input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
-            elif args.dataset_type == 2:
+            elif args.dataset_type == 'BOOLQ':
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
-            elif args.dataset_type == 3:
+            elif args.dataset_type == 'MNLI':
                 input_ids, atten, labels, token_type_id = batch['sent1input_ids'], batch['sent1attention_mask'], batch['gold_labels'], batch['sent1token_type_ids']
 
             #print("Input_ids:", input_ids)

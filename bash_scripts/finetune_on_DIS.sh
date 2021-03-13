@@ -16,6 +16,7 @@ BatchSize="16 32"
 
 ## Modify the script so that we can make a new directory for the different BERT experiments
 ## For label of size 6
+
 echo "Finetuning on DIS..."
 
 python finetuning.py \
@@ -23,7 +24,7 @@ python finetuning.py \
 --dev_data "$BASE_DIR/data/DIS/discourse_EN_FIVE_and_but_because_if_when_2017dec12_valid.tsv" \
 --model_name "DIS_BERT_e3_lr2e-5_b16" \
 --dataset_type "DIS" \
---multi_gpu_on \ 
+--multi_gpu_on \
 --batch_size "32" \
 --epochs "2" \
 --learning_rate " 2e-5" \

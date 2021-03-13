@@ -52,7 +52,7 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
             elif args.dataset_type == 'MNLI':
                 input_ids, atten, labels, token_type_id = batch['sentence_input_ids'], batch['sentence_attention_mask'], batch['gold_labels'], batch['sentence_token_type_ids']
             else:
-                input_ids, atten, labels, token_type_id = batch['sentences'], batch['attention_mask'], batch['labels'], batch['token_type_ids']
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['labels'], batch['token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)
@@ -72,8 +72,6 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
     print("Validation loss:", loss)
     
     if loss < min_loss:
-        min_loss = loss
-
         # Saving a trained model
         logging.info("** ** * Saving validated model ** ** * ")
         model_to_save = model.module if hasattr(model, 'module') else model
@@ -84,6 +82,12 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
         torch.save(model_to_save.state_dict(), output_model_file)
         model_to_save.config.to_json_file(output_config_file)
         tokenizer.save_vocabulary(model_path)
+
+        # New minimum loss value
+        return loss
+
+    # Old minimum loss value
+    return min_loss
 
 def main():
     parser = ArgumentParser()
@@ -133,6 +137,7 @@ def main():
     logging.info(f"  Learning rate = {args.learning_rate}")
     total_loss = 0
     global_step = 0
+    min_loss = float('inf')
 
     train_iterator = trange(0, args.epochs, desc="Epoch")
     for epoch, _ in enumerate(train_iterator):
@@ -175,7 +180,7 @@ def main():
             elif args.dataset_type == 'MNLI':
                 input_ids, atten, labels, token_type_id = batch['sentence_input_ids'], batch['sentence_attention_mask'], batch['gold_labels'], batch['sentence_token_type_ids']
             else:
-                input_ids, atten, labels, token_type_id = batch['sentences'], batch['attention_mask'], batch['labels'], batch['token_type_ids']
+                input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['labels'], batch['token_type_ids']
 
             #print("Input_ids:", input_ids)
             #print("Atten:", atten)
@@ -208,8 +213,7 @@ def main():
             global_step += 1
             epoch_iterator.set_description(f"Loss: {total_loss / (global_step + 1)}")
 	            
-        min_loss = float('inf')
-        validate(args, model, tokenizer, device, epoch, min_loss, model_path)
+        min_loss = validate(args, model, tokenizer, device, epoch, min_loss, model_path)
 
 if __name__ == '__main__':
     main()

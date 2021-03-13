@@ -4,7 +4,7 @@
 
 BASE_DIR=".."  # IndirectAnswers directory
 UNMATCHED_DIR="$BASE_DIR/data/CIRCA/unmatched/scenario"
-OUTPUT_DIR="$BASE_DIR/results/"
+OUTPUT_DIR="$BASE_DIR/models/"
 MODEL_TYPE="bert-base-cased"
 
 cd "$BASE_DIR"

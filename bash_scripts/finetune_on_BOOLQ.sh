@@ -2,8 +2,10 @@
 
 ## File for finetuning on the relaxed dataset
 
-BASE_DIR="/data2/limill01/IndirectAnswers/"
-OUTPUT_DIR="/data2/limill01/IndirectAnswers/results/"
+#BASE_DIR="/data2/limill01/IndirectAnswers/"
+#OUTPUT_DIR="/data2/limill01/IndirectAnswers/results/"
+BASE_DIR="/c/Users/limill01/Documents/IndirectAnswers/"
+OUTPUT_DIR="/c/Users/limill01/Documents/IndirectAnswers/models/"
 MODEL_TYPE="bert-base-cased"
 
 cd "$BASE_DIR"
@@ -16,24 +18,16 @@ BatchSize="16 32"
 ## For label of size 6
 echo "Finetuning on BOOLQ..."
 
-# Running through the different combinations
-for lr in $LearningRates; do
-    for e in $Epochs; do
-        for b in $BatchSize; do
-            echo "lr: $lr, epoch: $e, batch: $b"
-            python finetuning.py \
-                --train_data "$BASE_DIR/data/BoolQ/train.jsonl" \
-                --dev_data "$BASE_DIR/data/BoolQ/dev.jsonl" \
-                --model_name "BOOLQ_BERT_e${e}_lr${lr}_b${b}" \
-                --dataset_type "2" \
-                --batch_size "$b" \
-                --epochs "$e" \
-                --learning_rate "$lr" \
-                --output_dir "$OUTPUT_DIR" \
-                --model_type "$MODEL_TYPE" \
-                --num_labels "2"
-        done
-    done
-done
+python finetuning.py \
+--train_data "$BASE_DIR/data/BoolQ/train.jsonl" \
+--dev_data "$BASE_DIR/data/BoolQ/dev.jsonl" \
+--model_name "BOOLQ_BERT_e4_lr3e-5_b16" \
+--dataset_type "BOOLQ" \
+--batch_size "16" \
+--epochs "4" \
+--learning_rate " 3e-5" \
+--output_dir "$OUTPUT_DIR" \
+--model_type "$MODEL_TYPE" \
+--num_labels "2"
 
 echo "Finished finetuning on BOOLQ...""

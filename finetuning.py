@@ -19,9 +19,10 @@ logging.basicConfig(level=logging.INFO, format=log_format)
 # Runs validation to find the best model
 def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
     logging.info("***** Running development *****")
-
+    
     # Loads a dataset depending on the number
     # 1: Circa, 2: BoolQ, 3: MNLI, 4: DIS
+    dev_dataloader = None
     if args.dataset_type == 'CIRCA':
         dev_dataloader = dataloader.getCircaDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
     elif args.dataset_type == 'BOOLQ':
@@ -48,7 +49,7 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
             elif args.dataset_type == 'BOOLQ':
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
             elif args.dataset_type == 'MNLI':
-                input_ids, atten, labels, token_type_id = batch['sent1input_ids'], batch['sent1attention_mask'], batch['gold_labels'], batch['sent1token_type_ids']
+                input_ids, atten, labels, token_type_id = batch['sentence_input_ids'], batch['sentence_attention_mask'], batch['gold_labels'], batch['sentence_token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)
@@ -107,7 +108,7 @@ def main():
     model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     #device = "cpu"
-    
+
     model.zero_grad()
     model.to(device)
 
@@ -132,6 +133,7 @@ def main():
 
         # Loads a dataset depending on the number
         # 1: Circa, 2: BoolQ, 3: MNLI, 4: DIS
+        train_dataloader = None
         if args.dataset_type == 'CIRCA':
             train_dataloader = dataloader.getCircaDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, tokenizer=tokenizer)
         elif args.dataset_type == 'BOOLQ':
@@ -158,7 +160,7 @@ def main():
             elif args.dataset_type == 'BOOLQ':
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
             elif args.dataset_type == 'MNLI':
-                input_ids, atten, labels, token_type_id = batch['sent1input_ids'], batch['sent1attention_mask'], batch['gold_labels'], batch['sent1token_type_ids']
+                input_ids, atten, labels, token_type_id = batch['sentence_input_ids'], batch['sentence_attention_mask'], batch['gold_labels'], batch['sentence_token_type_ids']
 
             #print("Input_ids:", input_ids)
             #print("Atten:", atten)

@@ -4,6 +4,7 @@ from tqdm import tqdm, trange
 from transformers import AutoTokenizer, AutoModel, AdamW, BertTokenizer, BertForSequenceClassification, BertConfig
 
 import os
+import torch
 import logging
 import torch
 import shutil
@@ -106,6 +107,7 @@ def main():
 
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
     model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
+    model = torch.nn.DataParallel(model)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     #device = "cpu"
 
@@ -178,6 +180,9 @@ def main():
             outputs = model(input_ids=input_ids, token_type_ids=token_type_id, attention_mask=atten, labels=labels)
 
             loss = outputs[0]                                                                                                                                               
+            # Average on multi-gpu training
+            loss = torch.mean(loss)
+
             loss.backward()
 
             total_loss += loss.item()

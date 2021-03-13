@@ -89,6 +89,8 @@ def main():
     parser.add_argument('--model_name', type=str, required=True)
     parser.add_argument('--output_dir', type=Path, required=True)
     parser.add_argument('--dataset_type', type=str, required=True)
+    parser.add_argument('--multi_gpu_on', dest='multi_gpu', action='store_true')
+    parser.add_argument('--multi_gpu_off', dest='multi_gpu', action='store_false') 
     parser.add_argument('--epochs', type=int, default=20, help="number of epochs to train for")
     parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
     parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
@@ -96,6 +98,7 @@ def main():
     parser.add_argument('--grad_clip', type=float, default=0.25, help="Grad clipping value")
     parser.add_argument('--num_labels', type=int, required=True, help="choose the number of labels for the experiment")
 
+    parser.set_defaults(multi_gpu=False)
     args = parser.parse_args()
     
     if not os.path.exists(args.output_dir):
@@ -109,7 +112,10 @@ def main():
 
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
     model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
-    model = torch.nn.DataParallel(model)
+    
+    if args.multi_gpu:
+        model = torch.nn.DataParallel(model)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     #device = "cpu"
 
@@ -185,7 +191,8 @@ def main():
 
             loss = outputs[0]                                                                                                                                               
             # Average on multi-gpu training
-            loss = torch.mean(loss)
+            if args.multi_gpu:
+                loss = torch.mean(loss)
 
             loss.backward()
 

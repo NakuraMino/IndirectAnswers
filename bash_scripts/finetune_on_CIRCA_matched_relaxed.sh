@@ -3,6 +3,7 @@
 ## File for finetuning on the matched, relaxed dataset
 
 BASE_DIR=".."  # IndirectAnswers directory
+BASE_DIR="/data2/limill01/IndirectAnswers"
 OUTPUT_DIR="$BASE_DIR/models/"
 MODEL_TYPE="bert-base-cased"
 

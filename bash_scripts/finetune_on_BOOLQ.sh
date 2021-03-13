@@ -2,8 +2,10 @@
 
 ## File for finetuning on the relaxed dataset
 
-BASE_DIR="/data2/limill01/IndirectAnswers/"
-OUTPUT_DIR="/data2/limill01/IndirectAnswers/results/"
+#BASE_DIR="/data2/limill01/IndirectAnswers/"
+#OUTPUT_DIR="/data2/limill01/IndirectAnswers/results/"
+BASE_DIR="/c/Users/limill01/Documents/IndirectAnswers/"
+OUTPUT_DIR="/c/Users/limill01/Documents/IndirectAnswers/results/"
 MODEL_TYPE="bert-base-cased"
 
 cd "$BASE_DIR"

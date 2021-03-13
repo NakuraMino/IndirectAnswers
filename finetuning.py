@@ -48,7 +48,7 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
             elif args.dataset_type == 2:
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
             elif args.dataset_type == 3:
-                input_ids, atten, labels, token_type_id = batch['sent1input_ids'], batch['sent1attention_mask'], batch['gold_labels'], batch['sent1token_type_ids']
+                input_ids, atten, labels, token_type_id = batch['sentence_input_ids'], batch['sentence_attention_mask'], batch['gold_labels'], batch['sentence_token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)
@@ -107,7 +107,8 @@ def main():
     model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     #device = "cpu"
-    
+
+    print("Checking device:", device)
     model.zero_grad()
     model.to(device)
 
@@ -158,7 +159,7 @@ def main():
             elif args.dataset_type == 2:
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
             elif args.dataset_type == 3:
-                input_ids, atten, labels, token_type_id = batch['sent1input_ids'], batch['sent1attention_mask'], batch['gold_labels'], batch['sent1token_type_ids']
+                input_ids, atten, labels, token_type_id = batch['sentence_input_ids'], batch['sentence_attention_mask'], batch['gold_labels'], batch['sentence_token_type_ids']
 
             #print("Input_ids:", input_ids)
             #print("Atten:", atten)

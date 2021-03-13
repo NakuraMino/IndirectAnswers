@@ -31,7 +31,7 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
     elif args.dataset_type == 'MNLI':
         dev_dataloader = dataloader.getMNLIDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
     else:
-        print("Not implemented yet")
+        dev_dataloader = dataloader.getDISDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
     
     dev_loss = 0.0
     nb_dev_step = 0
@@ -51,6 +51,8 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
             elif args.dataset_type == 'MNLI':
                 input_ids, atten, labels, token_type_id = batch['sentence_input_ids'], batch['sentence_attention_mask'], batch['gold_labels'], batch['sentence_token_type_ids']
+            else:
+                input_ids, atten, labels, token_type_id = batch['sentences'], batch['attention_mask'], batch['labels'], batch['token_type_ids']
 
             input_ids = input_ids.to(device)
             atten = atten.to(device)
@@ -150,7 +152,7 @@ def main():
         elif args.dataset_type == 'MNLI':
             train_dataloader = dataloader.getMNLIDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, tokenizer=tokenizer)
         else:
-            print("Not implemented yet")
+            train_dataloader = dataloader.getDISDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, tokenizer=tokenizer)
 
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")                                       
         tr_loss = 0
@@ -169,6 +171,8 @@ def main():
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
             elif args.dataset_type == 'MNLI':
                 input_ids, atten, labels, token_type_id = batch['sentence_input_ids'], batch['sentence_attention_mask'], batch['gold_labels'], batch['sentence_token_type_ids']
+            else:
+                input_ids, atten, labels, token_type_id = batch['sentences'], batch['attention_mask'], batch['labels'], batch['token_type_ids']
 
             #print("Input_ids:", input_ids)
             #print("Atten:", atten)

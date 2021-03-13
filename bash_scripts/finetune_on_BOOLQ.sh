@@ -1,10 +1,10 @@
 #!/bin/bash
 
-## File for finetuning on the relaxed dataset
+## File for finetuning on the BOOLQ dataset
 
 #BASE_DIR="/data2/limill01/IndirectAnswers/"
 #OUTPUT_DIR="/data2/limill01/IndirectAnswers/models/"
-BASE_DIR="home/azureuser/IndirectAnswers/"
+BASE_DIR="/home/azureuser/IndirectAnswers/"
 OUTPUT_DIR="/home/azureuser/IndirectAnswers/models"
 MODEL_TYPE="bert-base-cased"
 

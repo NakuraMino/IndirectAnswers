@@ -60,7 +60,10 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
             token_type_id = token_type_id.to(device)
 
             outputs = model(input_ids=input_ids, attention_mask=atten, token_type_ids=token_type_id, labels=labels)
+
             tmp_dev_loss, _ = outputs[:2]
+            if args.multi_gpu:
+                tmp_dev_loss = torch.mean(tmp_dev_loss)
 
             dev_loss += tmp_dev_loss.item()
             nb_dev_step += 1
@@ -204,7 +207,7 @@ def main():
 
             global_step += 1
             epoch_iterator.set_description(f"Loss: {total_loss / (global_step + 1)}")
-            
+	            
         min_loss = float('inf')
         validate(args, model, tokenizer, device, epoch, min_loss, model_path)
 

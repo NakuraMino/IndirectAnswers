@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## File for finetuning on the relaxed dataset
+## File for finetuning on the DIS dataset
 
 #BASE_DIR="/data2/limill01/IndirectAnswers/"
 #OUTPUT_DIR="/data2/limill01/IndirectAnswers/results/

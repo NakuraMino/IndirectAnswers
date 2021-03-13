@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## File for finetuning on the relaxed dataset
+## File for finetuning on the MNLI dataset
 
 #BASE_DIR="/data2/limill01/IndirectAnswers/"
 #OUTPUT_DIR="/data2/limill01/IndirectAnswers/results/
@@ -29,6 +29,6 @@ python finetuning.py \
 --learning_rate " 2e-5" \
 --output_dir "$OUTPUT_DIR" \
 --model_type "$MODEL_TYPE" \
---num_labels "3"
+--num_labels "4"
 
 echo "Finished finetuning on MNLI..."

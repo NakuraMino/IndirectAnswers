@@ -2,10 +2,8 @@
 
 ## File for finetuning on the relaxed dataset
 
-#BASE_DIR="/data2/limill01/IndirectAnswers/"
-#OUTPUT_DIR="/data2/limill01/IndirectAnswers/results/"
-BASE_DIR="/c/Users/limill01/Documents/IndirectAnswers/"
-OUTPUT_DIR="/c/Users/limill01/Documents/IndirectAnswers/models/"
+BASE_DIR="/data2/limill01/IndirectAnswers/"
+OUTPUT_DIR="/data2/limill01/IndirectAnswers/models/"
 MODEL_TYPE="bert-base-cased"
 
 cd "$BASE_DIR"
@@ -23,6 +21,7 @@ python finetuning.py \
 --dev_data "$BASE_DIR/data/BoolQ/dev.jsonl" \
 --model_name "BOOLQ_BERT_e4_lr3e-5_b16" \
 --dataset_type "BOOLQ" \
+--multi_gpu_on \
 --batch_size "16" \
 --epochs "4" \
 --learning_rate " 3e-5" \
@@ -30,4 +29,4 @@ python finetuning.py \
 --model_type "$MODEL_TYPE" \
 --num_labels "2"
 
-echo "Finished finetuning on BOOLQ...""
+echo "Finished finetuning on BOOLQ..."

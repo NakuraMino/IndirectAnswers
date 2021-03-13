@@ -3,7 +3,7 @@
 ## File for finetuning on the unmatched, strict dataset
 
 BASE_DIR=".."  # IndirectAnswers directory
-OUTPUT_DIR="$BASE_DIR/results/"
+OUTPUT_DIR="$BASE_DIR/models/"
 MODEL_TYPE="bert-base-cased"
 
 cd "$BASE_DIR"

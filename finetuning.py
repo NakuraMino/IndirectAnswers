@@ -97,7 +97,9 @@ def main():
     parser.add_argument('--output_dir', type=Path, required=True)
     parser.add_argument('--dataset_type', type=str, required=True)
     parser.add_argument('--multi_gpu_on', dest='multi_gpu', action='store_true')
-    parser.add_argument('--multi_gpu_off', dest='multi_gpu', action='store_false') 
+    parser.add_argument('--multi_gpu_off', dest='multi_gpu', action='store_false')
+    parser.add_argument('--transfer_on', dest='transfer_learning', action='store_true')
+    parser.add_argument('--transfer_off', dest='transfer_learning', action='store_false')
     parser.add_argument('--epochs', type=int, default=20, help="number of epochs to train for")
     parser.add_argument('--model_type', type=str, required=True, help="choose a valid pretrained model")
     parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
@@ -106,6 +108,8 @@ def main():
     parser.add_argument('--num_labels', type=int, required=True, help="choose the number of labels for the experiment")
 
     parser.set_defaults(multi_gpu=False)
+    parser.set_defaults(transfer_learning=False)
+
     args = parser.parse_args()
     
     if not os.path.exists(args.output_dir):
@@ -115,7 +119,7 @@ def main():
     if not os.path.exists(model_path):
         os.mkdir(model_path)    
 
-    config = BertConfig.from_pretrained(args.model_type, num_labels=args.num_labels)
+    config = BertConfig.from_pretrained(args.model_type, num_labels=2)
 
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
     model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
@@ -132,6 +136,20 @@ def main():
     params = [p for n,p in model.named_parameters()]
     optimizer = AdamW(params, lr=args.learning_rate)
 
+    if args.transfer_learning:
+        for idx, param in enumerate(model.parameters()):
+            print("Shape:", param.size())
+            if idx == 2 or idx == len(params) - 2:
+                param.data = torch.rand((args.num_labels, param.size()[1])).to(device)
+                print("Shape of param:", param.shape)
+
+            elif idx == len(params) - 1:
+                param.data = torch.rand(args.num_labels).to(device)
+                print("Shape of param2:", param.shape)
+   
+    print()
+    for idx, param in enumerate(model.parameters()):
+        print("Shape:", param.size())
     logging.info("****** Running training *****")
     logging.info(f"  Num epochs = {args.epochs}")
     logging.info(f"  Learning rate = {args.learning_rate}")
@@ -186,6 +204,11 @@ def main():
             #print("Atten:", atten)
             #print("TTI:", token_type_id)
             #print("Labels:", labels)
+            print("Shape of input_ids:", input_ids.shape)
+            print("Shape of atten:", atten.shape)
+            print("Shape of labels:", labels.shape)
+            print("Shape of token_type_id:", token_type_id.shape)
+
             input_ids = input_ids.to(device)
             atten = atten.to(device)
             labels = labels.to(device).squeeze()

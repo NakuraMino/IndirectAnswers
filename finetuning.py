@@ -106,7 +106,8 @@ def main():
     parser.add_argument('--learning_rate', default=1e-5, type=float, help="initial learning rate for Adam")
     parser.add_argument('--grad_clip', type=float, default=0.25, help="Grad clipping value")
     parser.add_argument('--num_labels', type=int, required=True, help="choose the number of labels for the experiment")
-
+    parser.add_argument("--prev_labels", type=int, default=0, help="previous number of labels")
+    
     parser.set_defaults(multi_gpu=False)
     parser.set_defaults(transfer_learning=False)
 
@@ -119,11 +120,19 @@ def main():
     if not os.path.exists(model_path):
         os.mkdir(model_path)    
 
-    config = BertConfig.from_pretrained(args.model_type, num_labels=2)
-
-    tokenizer = BertTokenizer.from_pretrained(args.model_type)
-    model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
+    if args.prev_labels != 0:
+        config = BertConfig.from_pretrained(args.model_type, num_labels=args.prev_labels) 
+    else:
+        config = BertConfig.from_pretrained(args.model_type, num_labels=args.num_labels)
     
+
+    tokenizer = BertTokenizer.from_pretrained(args.model_type)        
+    
+    model = BertForSequenceClassification.from_pretrained(args.model_type, config=config)
+    if args.transfer_learning:
+        model.classifier = torch.nn.Linear(768, args.num_labels)
+        model.num_labels = args.num_labels
+
     if args.multi_gpu:
         model = torch.nn.DataParallel(model)
 
@@ -136,20 +145,6 @@ def main():
     params = [p for n,p in model.named_parameters()]
     optimizer = AdamW(params, lr=args.learning_rate)
 
-    if args.transfer_learning:
-        for idx, param in enumerate(model.parameters()):
-            print("Shape:", param.size())
-            if idx == 2 or idx == len(params) - 2:
-                param.data = torch.rand((args.num_labels, param.size()[1])).to(device)
-                print("Shape of param:", param.shape)
-
-            elif idx == len(params) - 1:
-                param.data = torch.rand(args.num_labels).to(device)
-                print("Shape of param2:", param.shape)
-   
-    print()
-    for idx, param in enumerate(model.parameters()):
-        print("Shape:", param.size())
     logging.info("****** Running training *****")
     logging.info(f"  Num epochs = {args.epochs}")
     logging.info(f"  Learning rate = {args.learning_rate}")
@@ -159,15 +154,6 @@ def main():
 
     train_iterator = trange(0, args.epochs, desc="Epoch")
     for epoch, _ in enumerate(train_iterator):
-        # epoch_dataset = dataset_train                                                                   
-        # train_dataloader = DataLoader(
-        #   	epoch_dataset, 
-        #     batch_size=args.train_batch_size, 
-        #     shuffle=False,
-        # )
-        #train_dataloader = dataloader.getCircaDataloader('./data/circa-data.tsv', batch_size=1, num_workers=1, use_tokenizer=False)
-
-        # Loads a dataset depending on the number
         # 1: Circa, 2: BoolQ, 3: MNLI, 4: DIS
         train_dataloader = None
         if args.dataset_type == 'CIRCA':
@@ -200,23 +186,10 @@ def main():
             else:
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['labels'], batch['token_type_ids']
 
-            #print("Input_ids:", input_ids)
-            #print("Atten:", atten)
-            #print("TTI:", token_type_id)
-            #print("Labels:", labels)
-            print("Shape of input_ids:", input_ids.shape)
-            print("Shape of atten:", atten.shape)
-            print("Shape of labels:", labels.shape)
-            print("Shape of token_type_id:", token_type_id.shape)
-
             input_ids = input_ids.to(device)
             atten = atten.to(device)
             labels = labels.to(device).squeeze()
             token_type_id = token_type_id.to(device)
-
-            #input_ids = torch.reshape(input_ids, (1, -1))
-            #atten = torch.reshape(atten, (1, -1))
-            #token_type_id = torch.reshape(token_type_id, (1, -1))
 
             outputs = model(input_ids=input_ids, token_type_ids=token_type_id, attention_mask=atten, labels=labels)
 

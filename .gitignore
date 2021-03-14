@@ -131,3 +131,6 @@ dmypy.json
 # Within the folder
 results/
 data/mnli/
+models/
+data/multinli*
+data/__*

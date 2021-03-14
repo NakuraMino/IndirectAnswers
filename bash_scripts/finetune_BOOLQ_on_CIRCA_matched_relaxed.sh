@@ -29,6 +29,7 @@ python finetuning.py \
     --learning_rate "${lr}" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
-    --num_labels "6"
+    --num_labels "6" \
+    --prev_labels "2"
 
 echo "Finished finetuning BOOLQ CIRCA with matched, relaxed labels..."

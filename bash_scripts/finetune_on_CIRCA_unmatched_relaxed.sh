@@ -2,7 +2,7 @@
 
 ## File for finetuning on the unmatched, relaxed dataset
 
-BASE_DIR=".."  # IndirectAnswers directory
+BASE_DIR="/home/azureuser/IndirectAnswers"  # IndirectAnswers directory
 UNMATCHED_DIR="$BASE_DIR/data/CIRCA/unmatched/scenario"
 OUTPUT_DIR="$BASE_DIR/models/"
 MODEL_TYPE="bert-base-cased"

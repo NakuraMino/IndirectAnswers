@@ -26,6 +26,7 @@ for i in ${!Modes[@]}; do
         --dev_data "$BASE_DIR/data/CIRCA/circa-data-dev.tsv" \
         --model_name "CIRCA_BERT_matched_relaxed_${mode}_e3_lr${lr}_b32" \
         --dataset_type "CIRCA" \
+        --dataset_mode "$mode" \
         --batch_size "32" \
         --epochs "3" \
         --learning_rate "$lr" \

@@ -25,7 +25,7 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
     # 1: Circa, 2: BoolQ, 3: MNLI, 4: DIS
     dev_dataloader = None
     if args.dataset_type == 'CIRCA':
-        dev_dataloader = dataloader.getCircaDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
+        dev_dataloader = dataloader.getCircaDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer, mode=args.dataset_mode)
     elif args.dataset_type == 'BOOLQ':
         dev_dataloader = dataloader.getBOOLQDataloader(args.dev_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
     elif args.dataset_type == 'MNLI':
@@ -107,6 +107,7 @@ def main():
     parser.add_argument('--grad_clip', type=float, default=0.25, help="Grad clipping value")
     parser.add_argument('--num_labels', type=int, required=True, help="choose the number of labels for the experiment")
     parser.add_argument("--prev_labels", type=int, default=0, help="previous number of labels")
+    parser.add_argument('--dataset_mode', type=str)
     
     parser.set_defaults(multi_gpu=False)
     parser.set_defaults(transfer_learning=False)
@@ -157,7 +158,7 @@ def main():
         # 1: Circa, 2: BoolQ, 3: MNLI, 4: DIS
         train_dataloader = None
         if args.dataset_type == 'CIRCA':
-            train_dataloader = dataloader.getCircaDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, tokenizer=tokenizer)
+            train_dataloader = dataloader.getCircaDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, tokenizer=tokenizer, mode=args.dataset_mode)
         elif args.dataset_type == 'BOOLQ':
             print("BOOLQ")
             train_dataloader = dataloader.getBOOLQDataloader(args.train_data, batch_size=args.batch_size, num_workers=1, tokenizer=tokenizer)

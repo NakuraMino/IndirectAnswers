@@ -16,7 +16,7 @@ def evaluate(args, model, tokenizer, device):
     # Loads a dataset
     test_dataloader = None
     if args.dataset_type == 'CIRCA':
-        test_dataloader = dataloader.getCircaDataloader(args.test_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
+        test_dataloader = dataloader.getCircaDataloader(args.test_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer, mode=args.dataset_mode)
     elif args.dataset_type == 'BOOLQ':
         test_dataloader = dataloader.getBOOLQDataloader(args.test_data, batch_size=args.batch_size, num_workers=4, tokenizer=tokenizer)
     elif args.dataset_type == 'MNLI':
@@ -83,6 +83,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', default=32, type=int, help="total batch size")
     parser.add_argument('--num_labels', type=int, required=True, help="choose the number of labels for the experiment")
     parser.add_argument('--output_path', type=str, required=True, help="results output file name")
+    parser.add_argument('--dataset_mode', type=str)
     args = parser.parse_args()
     
     config = BertConfig.from_pretrained(args.model_type, num_labels=args.num_labels)

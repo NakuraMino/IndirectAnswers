@@ -23,6 +23,7 @@ for i in ${!Modes[@]}; do
             --test_data "${UNMATCHED_DIR}${j}/circa-data-test.tsv" \
             --model_type "$BASE_DIR/models/CIRCA_BERT_unmatched_strict_${mode}_s${j}_e3_lr${lr}_b32" \
             --dataset_type "CIRCA" \
+            --dataset_mode "$mode" \
             --batch_size "32" \
             --num_labels "9" \
             --output_path "$BASE_DIR/results/CIRCA-test-results.tsv"
@@ -32,6 +33,7 @@ for i in ${!Modes[@]}; do
             --test_data "${UNMATCHED_DIR}${j}/circa-data-dev.tsv" \
             --model_type "$BASE_DIR/models/CIRCA_BERT_unmatched_strict_${mode}_s${j}_e3_lr${lr}_b32" \
             --dataset_type "CIRCA" \
+            --dataset_mode "$mode" \
             --batch_size "32" \
             --num_labels "9" \
             --output_path "$BASE_DIR/results/CIRCA-dev-results.tsv"

@@ -7,33 +7,50 @@ import sklearn.metrics as metrics
 import dataloader 
 import torch 
 
-dl = dataloader.getCircaDataloader("./data/CIRCA/circa-data-test.tsv")
-dl_iter = iter(dl)
-
-strict_pred_labels = None
-relaxed_pred_labels = None
-
-for batch in dl_iter: 
+def getClassLabels(file_path):
+    """
+    gets majority class strict and reaxed labels for a dataset
     
-    # strict case
-    strict_labels = batch["goldstandard1"]
-    if strict_pred_labels is None: 
-        strict_pred_labels = strict_labels
-    else:      
-        strict_pred_labels = torch.cat([strict_pred_labels, strict_labels], dim=0)
-    # relaxed case
-    relaxed_labels = batch["goldstandard2"]
-    if relaxed_pred_labels is None:
-        relaxed_pred_labels = relaxed_labels
-    else:
-        relaxed_pred_labels = torch.cat([relaxed_pred_labels, relaxed_labels], dim=0)
+    @return: tuple of (N,) torch.long vectors where first element is the 
+             strict labels and the second element is the relaxed labels
+    """
+    dl = dataloader.getCircaDataloader(file_path)
+    dl_iter = iter(dl)
 
-shape = relaxed_pred_labels.shape
-pred_labels = torch.zeros(shape)
-strict_f1_score = metrics.f1_score(strict_pred_labels, pred_labels, average=None)
-relaxed_f1_score = metrics.f1_score(relaxed_pred_labels, pred_labels, average=None)
+    strict_labels = None
+    relaxed_labels = None
 
-print("strict f1 scores: ", strict_f1_score)
-print("relaxed f1_scores: ", relaxed_f1_score)
+    for batch in dl_iter: 
         
+        # strict case
+        strict_batch_labels = batch["goldstandard1"]
+        if strict_labels is None: 
+            strict_labels = strict_batch_labels
+        else:      
+            strict_labels = torch.cat([strict_labels, strict_batch_labels], dim=0)
+        # relaxed case
+        relaxed_batch_labels = batch["goldstandard2"]
+        if relaxed_labels is None:
+            relaxed_labels = relaxed_batch_labels
+        else:
+            relaxed_labels = torch.cat([relaxed_labels, relaxed_batch_labels], dim=0)
+    return strict_labels, relaxed_labels
 
+def printStatistics(pred_labels, y_labels, title=""):
+    f1_score = metrics.f1_score(y_labels, pred_labels, average=None)
+    num_correct = torch.sum(pred_labels == y_labels)
+    average = num_correct / y_labels.shape[0]
+    print(f"{title} accuracy: {average}")
+    print(f"{title} f1 scores: {f1_score}")
+    print()
+
+strict_test_labels, relaxed_test_labels = getClassLabels("./data/CIRCA/circa-data-test.tsv")
+strict_dev_labels, relaxed_dev_labels = getClassLabels("./data/CIRCA/circa-data-dev.tsv")
+
+shape = relaxed_dev_labels.shape
+pred_labels = torch.zeros(shape)
+
+printStatistics(strict_test_labels, pred_labels, "test strict")
+printStatistics(strict_dev_labels, pred_labels, "dev strict")
+printStatistics(relaxed_test_labels, pred_labels, "test relaxed")
+printStatistics(relaxed_dev_labels, pred_labels, "dev relaxed")

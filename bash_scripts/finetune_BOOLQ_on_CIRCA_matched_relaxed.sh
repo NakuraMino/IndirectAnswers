@@ -26,7 +26,7 @@ python finetuning.py \
     --transfer_on \
     --batch_size "32" \
     --epochs "3" \
-    --learning_rate "${lr}" \
+    --learning_rate "$lr" \
     --output_dir "$OUTPUT_DIR" \
     --model_type "$MODEL_TYPE" \
     --num_labels "6" \

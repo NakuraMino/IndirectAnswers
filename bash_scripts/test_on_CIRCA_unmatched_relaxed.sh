@@ -21,7 +21,7 @@ for i in ${!Modes[@]}; do
         # Evaluate on test dataset
         python testing.py \
             --test_data "${UNMATCHED_DIR}${j}/circa-data-test.tsv" \
-            --model_name "$BASE_DIR/models/CIRCA_BERT_unmatched_relaxed_${mode}_s${j}_e3_lr${lr}_b32" \
+            --model_type "$BASE_DIR/models/CIRCA_BERT_unmatched_relaxed_${mode}_s${j}_e3_lr${lr}_b32" \
             --dataset_type "CIRCA" \
             --batch_size "32" \
             --num_labels "6"
@@ -30,7 +30,7 @@ for i in ${!Modes[@]}; do
         # Evaluate on dev dataset
         python testing.py \
             --test_data "${UNMATCHED_DIR}${j}/circa-data-dev.tsv" \
-            --model_name "$BASE_DIR/models/CIRCA_BERT_unmatched_relaxed_${mode}_s${j}_e3_lr${lr}_b32" \
+            --model_type "$BASE_DIR/models/CIRCA_BERT_unmatched_relaxed_${mode}_s${j}_e3_lr${lr}_b32" \
             --dataset_type "CIRCA" \
             --batch_size "32" \
             --num_labels "6"

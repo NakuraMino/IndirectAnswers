@@ -60,7 +60,7 @@ def evaluate(args, model, tokenizer, device):
     print('F1 scores:', f1)
 
     # Load tsv file and save results
-    cols = ['model', 'accuracy', '0', '1', '2', '3', '4', '5', '6', '7', '8']
+    cols = ['model', 'accuracy', 'Yes', 'No', 'C.yes', 'Mid', 'Other', 'P.yes', 'P.no', 'Unsure', '8']
     df = None
     if os.path.exists(args.output_path):
         df = pd.read_csv(args.output_path, sep='\t')

@@ -129,7 +129,6 @@ dmypy.json
 .pyre/
 
 # Within the folder
-results/
 data/mnli/
 models/
 data/multinli*

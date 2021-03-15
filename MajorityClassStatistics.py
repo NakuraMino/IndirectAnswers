@@ -62,20 +62,22 @@ strict_average_list = []
 relaxed_average_list = []
 for i in range(10):
     strict_test_labels, relaxed_test_labels = getClassLabels("./data/CIRCA/unmatched/scenario" + str(i) + "/circa-data-test.tsv")
-    pred_labels = torch.zeroes(strict_test_labels.shape)
+    pred_labels = torch.zeros(strict_test_labels.shape)
     _, strict_average = printStatistics(pred_labels, strict_test_labels, p=False)
     _, relaxed_average = printStatistics(pred_labels, relaxed_test_labels, p=False)
-    
+    strict_average_list.append(strict_average.item())
+    relaxed_average_list.append(relaxed_average.item())
+
 print("strict unmatched statistics")
-print(f"mean: {sum(strict_average_list) / len(strict_average_list)}")
-print(f"mean: {statistics.pstdev(strict_average_list)}")
-print(f"max : {max(strict_average_list)}")
-print(f"min : {min(strict_average_list)}")
+print(f"mean     : {sum(strict_average_list) / len(strict_average_list)}")
+print(f"std. dev.: {statistics.pstdev(strict_average_list)}")
+print(f"max      : {max(strict_average_list)}")
+print(f"min      : {min(strict_average_list)}")
 print()
 
 print("relaxed unmatched statistics")
-print(f"mean: {sum(relaxed_average_list) / len(relaxed_average_list)}")
-print(f"mean: {statistics.pstdev(relaxed_average_list)}")
-print(f"max : {max(relaxed_average_list)}")
-print(f"min : {min(relaxed_average_list)}")
+print(f"mean     : {sum(relaxed_average_list) / len(relaxed_average_list)}")
+print(f"std. dev.: {statistics.pstdev(relaxed_average_list)}")
+print(f"max      : {max(relaxed_average_list)}")
+print(f"min      : {min(relaxed_average_list)}")
 print()

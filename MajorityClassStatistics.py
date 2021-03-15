@@ -17,12 +17,9 @@ def getClassLabels(file_path):
     """
     dl = dataloader.getCircaDataloader(file_path)
     dl_iter = iter(dl)
-
     strict_labels = None
     relaxed_labels = None
-
     for batch in dl_iter: 
-        
         # strict case
         strict_batch_labels = batch["goldstandard1"]
         if strict_labels is None: 
@@ -46,6 +43,7 @@ def printStatistics(pred_labels, y_labels, title="", p=True):
         print(f"{title} f1 scores: {f1_score}")
         print()
     return f1_score, average
+
 
 strict_test_labels, relaxed_test_labels = getClassLabels("./data/CIRCA/circa-data-test.tsv")
 strict_dev_labels, relaxed_dev_labels = getClassLabels("./data/CIRCA/circa-data-dev.tsv")

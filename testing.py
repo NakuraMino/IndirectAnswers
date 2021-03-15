@@ -66,7 +66,9 @@ def evaluate(args, model, tokenizer, device):
         row[i + 2] = f1[i]
 
     df.append(pd.DataFrame(row, columns=cols))
-
+    df.to_csv(args.output_path, sep="\t", index=None)
+    print('Accuracy:', accuracy)
+    print('F1 scores:', f1)
 
 
 if __name__ == '__main__':
@@ -85,6 +87,4 @@ if __name__ == '__main__':
     tokenizer = BertTokenizer.from_pretrained(args.model_type)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    accuracy, f1 = evaluate(args, model, tokenizer, device)
-    print(f"Accuracy: {accuracy}")
-    print(f"F1 score: {f1}")
+    evaluate(args, model, tokenizer, device)

@@ -32,7 +32,7 @@ def evaluate(args, model, tokenizer, device):
     for batch in tqdm(test_dataloader, desc="Checking model accuracy..."):
         with torch.no_grad():
             if args.dataset_type == 'CIRCA':
-                if args.num_labels == 9 :  # Strict case
+                if args.num_labels == 9:  # Strict case
                     # == 4 is a hack to test MNLI baseline model
                     input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
                 else:  # Relaxed case

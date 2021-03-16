@@ -132,4 +132,5 @@ dmypy.json
 data/mnli/
 models/
 data/multinli*
+data/snli*
 data/__*

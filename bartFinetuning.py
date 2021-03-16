@@ -43,10 +43,10 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
             if args.dataset_type == 'CIRCA':
                 # Strict case
                 if args.num_labels == 9:
-                    input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+                    input_ids, atten, labels = batch['input_ids'], batch['attention_mask'], batch['goldstandard1']
                 # Relaxed case
                 else:
-                    input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
+                    input_ids, atten, labels = batch['input_ids'], batch['attention_mask'], batch['goldstandard2']
             elif args.dataset_type == 'BOOLQ':
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
             elif args.dataset_type == 'MNLI':
@@ -57,9 +57,8 @@ def validate(args, model, tokenizer, device, epoch, min_loss, model_path):
             input_ids = input_ids.to(device)
             atten = atten.to(device)
             labels = labels.to(device).squeeze()
-            token_type_id = token_type_id.to(device)
 
-            outputs = model(input_ids=input_ids, attention_mask=atten, token_type_ids=token_type_id, labels=labels)
+            outputs = model(input_ids=input_ids, attention_mask=atten, labels=labels)
 
             tmp_dev_loss, _ = outputs[:2]
             if args.multi_gpu:
@@ -172,13 +171,14 @@ def main():
         model.train()
         
         for step, batch in enumerate(epoch_iterator):
+
             if args.dataset_type == 'CIRCA':
                 # Strict case
                 if args.num_labels == 9:
-                    input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard1'], batch['token_type_ids']
+                   input_ids, atten, labels = batch['input_ids'], batch['attention_mask'], batch['goldstandard1']
                 # Relaxed case
                 else:
-                    input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['goldstandard2'], batch['token_type_ids']
+                    input_ids, atten, labels = batch['input_ids'], batch['attention_mask'], batch['goldstandard2']
             elif args.dataset_type == 'BOOLQ':
                 input_ids, atten, labels, token_type_id = batch['input_ids'], batch['attention_mask'], batch['answer'], batch['token_type_ids']
             elif args.dataset_type == 'MNLI':
@@ -189,9 +189,8 @@ def main():
             input_ids = input_ids.to(device)
             atten = atten.to(device)
             labels = labels.to(device).squeeze()
-            token_type_id = token_type_id.to(device)
 
-            outputs = model(input_ids=input_ids, token_type_ids=token_type_id, attention_mask=atten, labels=labels)
+            outputs = model(input_ids=input_ids, attention_mask=atten, labels=labels)
 
             loss = outputs[0]                                                                                                                                               
             # Average on multi-gpu training

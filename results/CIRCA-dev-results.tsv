@@ -1,7 +1,7 @@
-model	accuracy	0	1	2	3	4	5	6	7	8	Yes	No	C.yes	Mid	Other	P.yes	P.no	Unsure
-/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_strict_q_e3_lr2e-5_b32	0.737233732	0.817286304	0.763956044	0.882989184	0.423529412	0.820512821	0.05984252	0.43255814	0.218430034									
-/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_strict_a_e3_lr2e-5_b32	0.747446746	0.828240592	0.771069442	0.873804971	0.344827586	0.8	0.040609137	0.43715847	0.068085106									
-/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_strict_qa_e3_lr3e-5_b32	0.748759848	0.829727498	0.77538334	0.903688525	0.440366972	0.834862385	0.096240602	0.468085106	0.192857143									
-/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_relaxed_q_e3_lr3e-5_b32	0.82885906	0.864207879	0.818404908	0.889779559	0.343642612	0.826666667	0											
-/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_relaxed_a_e3_lr2e-5_b32	0.827254158	0.859450727	0.821149074	0.904419322	0.343042071	0.872246696	0.013245033											
-/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_relaxed_qa_e3_lr3e-5_b32	0.837613073	0.867859204	0.836208568	0.892929293	0.297709924	0.863636364	0											
+model	accuracy	Yes	No	C.yes	Mid	Other	P.yes	P.no	Unsure	8
+/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_strict_q_e3_lr2e-5_b32	0.473592063	0.6011912	0.371333702	0	0	0.900900901	0	0.015810277	0	
+/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_strict_a_e3_lr2e-5_b32	0.696673475	0.790031153	0.715328467	0.862135922	0.109589041	0	0.095367847	0.4	0.089795918	
+/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_strict_qa_e3_lr3e-5_b32	0.748759848	0.829727498	0.77538334	0.903688525	0.440366972	0.834862385	0.096240602	0.468085106	0.192857143	
+/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_relaxed_q_e3_lr3e-5_b32	0.540414357	0.610986547	0.521014493	0	0	0.86	0			
+/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_relaxed_a_e3_lr2e-5_b32	0.7856726	0.82665542	0.774256271	0.891108891	0.077669903	0	0			
+/home/azureuser/IndirectAnswers/models/CIRCA_BERT_matched_relaxed_qa_e3_lr3e-5_b32	0.837613073	0.867859204	0.836208568	0.892929293	0.297709924	0.863636364	0			

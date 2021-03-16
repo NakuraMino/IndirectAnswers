@@ -1,0 +1,4 @@
+bash_scripts\finetune_SNLI_on_CIRCA_matched_relaxed.sh
+bash_scripts\finetune_SNLI_on_CIRCA_matched_strict.sh
+bash_scripts\finetune_SNLI_on_CIRCA_unmatched_relaxed.sh
+bash_scripts\finetune_SNLI_on_CIRCA_unmatched_strict.sh

@@ -17,7 +17,7 @@ python MNLItesting.py \
 --dataset_mode "qa" \
 --batch_size "32" \
 --num_labels "2" \
---output_path "$BASE_DIR/results/CIRCA-test-results.tsv"
+--output_path "$BASE_DIR/results/BOOLQ-test-results.tsv"
 
 # Evaluate on dev dataset
 python MNLItesting.py \
@@ -27,6 +27,6 @@ python MNLItesting.py \
 --dataset_mode "qa" \
 --batch_size "32" \
 --num_labels "2" \
---output_path "$BASE_DIR/results/CIRCA-dev-results.tsv"
+--output_path "$BASE_DIR/results/BOOLQ-dev-results.tsv"
 
 echo "Finished testing CIRCA with matched, strict labels..."

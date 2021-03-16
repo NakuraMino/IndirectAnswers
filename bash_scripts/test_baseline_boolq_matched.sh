@@ -7,12 +7,12 @@ BASE_DIR="/home/azureuser/IndirectAnswers"
 cd "$BASE_DIR"
 
 
-echo "Testing MNLI on CIRCA with matched, strict labels..."
+echo "Testing BOOLQ on CIRCA with matched, strict labels..."
 
 # Evaluate on test dataset
 python MNLItesting.py \
 --test_data "$BASE_DIR/data/CIRCA/circa-data-test.tsv" \
---model_type "$BASE_DIR/models/MNLI_BERT_e3_lr2e-5_b16" \
+--model_type "$BASE_DIR/models/BOOLQ_BERT_e4_lr3e-5_b16" \
 --dataset_type "CIRCA" \
 --dataset_mode "qa" \
 --batch_size "32" \
@@ -22,7 +22,7 @@ python MNLItesting.py \
 # Evaluate on dev dataset
 python MNLItesting.py \
 --test_data "$BASE_DIR/data/CIRCA/circa-data-dev.tsv" \
---model_type "$BASE_DIR/models/MNLI_BERT_e3_lr2e-5_b16" \
+--model_type "$BASE_DIR/models/BOOLQ_BERT_e4_lr3e-5_b16" \
 --dataset_type "CIRCA" \
 --dataset_mode "qa" \
 --batch_size "32" \

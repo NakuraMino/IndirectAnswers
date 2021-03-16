@@ -21,7 +21,7 @@ for j in $ScenarioNum; do # 10 iterations, leaving a different scenario out each
     --model_type "$BASE_DIR/models/SNLI_CIRCA_BERT_unmatched_relaxed_s${j}_e3_lr${lr}_b32" \
     --dataset_type "CIRCA" \
     --batch_size "32" \
-    --num_labels "9" \
+    --num_labels "6" \
     --output_path "$BASE_DIR/results/SNLI-test-results.tsv"
     
     echo "evaluating on dev dataset"
@@ -31,7 +31,7 @@ for j in $ScenarioNum; do # 10 iterations, leaving a different scenario out each
     --model_type "$BASE_DIR/models/SNLI_CIRCA_BERT_unmatched_relaxed_s${j}_e3_lr${lr}_b32" \
     --dataset_type "CIRCA" \
     --batch_size "32" \
-    --num_labels "9" \
+    --num_labels "6" \
     --output_path "$BASE_DIR/results/SNLI-dev-results.tsv"
 done
 

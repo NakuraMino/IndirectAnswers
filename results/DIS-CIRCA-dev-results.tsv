@@ -1,0 +1,2 @@
+model	accuracy	Yes	No	C.yes	Mid	Other	P.yes	P.no	Unsure	8
+/home/azureuser/IndirectAnswers/models/DIS_CIRCA_BERT_matched_relaxed_e3_lr5e-5_b32	0.8462211847096586	0.8748184722625617	0.8477225080998666	0.9085239085239085	0.22580645161290325	0.9082568807339448	0.0			

@@ -25,7 +25,7 @@ for i in ${!Modes[@]}; do
             --dataset_type "CIRCA" \
             --dataset_mode "$mode" \
             --batch_size "32" \
-            --num_labels "6"
+            --num_labels "6" \
             --output_path "$BASE_DIR/results/CIRCA-test-results.tsv"
         
         # Evaluate on dev dataset
@@ -35,7 +35,7 @@ for i in ${!Modes[@]}; do
             --dataset_type "CIRCA" \
             --dataset_mode "$mode" \
             --batch_size "32" \
-            --num_labels "6"
+            --num_labels "6" \
             --output_path "$BASE_DIR/results/CIRCA-dev-results.tsv"
     done
 done
